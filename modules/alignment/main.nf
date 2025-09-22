@@ -4,19 +4,22 @@ nextflow.enable.dsl=2
 
 process DO_MINIMAP {
     input:
-    tuple path(ref_genome), path(fasta_file)
+    path ref_genome
+    path combined_fasta
 
     output:
-    path "aa_changes.csv", emit: aa_changes
+    path "alignment.sam", emit: alignment_sam
 
     script:
     """
-    minimap2 -a \\ 
-             -x asm20 \\ # optimized for mapping genome assemblies
-             --score-N=0 \\ # make alignments neutral to N (no penalty)
-             -N 0 \\ # no secondary alignments
-             -p 0.8 \\ 
-             -o ${ref_genome} ${selected_segments} > alignment.sam
+    ls -l ${ref_genome}
+    ls -l ${combined_fasta}
+    minimap2 -a \\
+             -x asm20 \\
+             --score-N=0 \\
+             -N 0 \\
+             -p 0.8 \\
+             ${ref_genome} ${combined_fasta} > alignment.sam
     """
 
 }

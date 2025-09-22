@@ -11,6 +11,9 @@ def validateParameters() {
     if (!params.fasta_path) {
         exit 1, "Input FASTA file not specified!"
     }
+    if (!params.gb_dir) {
+        exit 1, "Input GB directory not specified!"
+    }
 }
 
 workflow {

@@ -22,11 +22,12 @@ workflow GENERAL_WORKFLOW {
         log.info "Running variant analysis using consensus sequence on the whole genome"
         fasta_ch = selected_fasta
                     .splitText()
-                    .map{ filename -> file("${params.fasta_path}/${filename}") } // make each string as a single file
-        fasta_ch.view()
+                    .map{ filename -> 
+                        def trimed_filename = filename.trim()
+                        file("${params.fasta_path}/${trimed_filename}").normalize() 
+                        } 
+        combined_fasta_ch = fasta_ch.collectFile() { filename ->
+            ["combined.fasta", file(filename).text]}
 
-        VARIANT_ANALYSIS_WORKFLOW(ref, selected_segments)
-
-        res_sam = DO_MINIMAP(ref, selected_segments)
-        res_csv = GO_FASTA(res_sam)
+        VARIANT_ANALYSIS_WORKFLOW(ref_genome, combined_fasta_ch)
 }

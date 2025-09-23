@@ -1,3 +1,5 @@
+#!/usr/bin/env nextflow
+
 nextflow.enable.dsl=2
 
 // main file to take the input
@@ -14,6 +16,9 @@ def validateParameters() {
     if (!params.gb_dir) {
         exit 1, "Input GB directory not specified!"
     }
+    // if (!params.metadata) {
+    //     exit 1, "Metadata not specified!"
+    // }
 }
 
 workflow {
@@ -23,5 +28,7 @@ workflow {
 
     // segments_ch = Channel.empty()
 
-    GENERAL_WORKFLOW()
+    metadata_ch = Channel.fromPath(params.metadata)
+
+    GENERAL_WORKFLOW(metadata_ch)
 }

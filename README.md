@@ -18,15 +18,16 @@ current workflow:
  - no option for append-codons
 
 5. file format conversion with gofasta
- - not done yet
+ - tsv file 
+ - ref_nuc vs ref_codon?
 
 
-current output: /output/aa_changes.csv
+current output: /output/mutations.tsv
 
 current cmd to run:
 ```
 git clone https://github.com/andersen-lab/HCoV-19-Genomics
 cd bjorn_rep
-nextflow run main.nf --ref /path/to/ref/fasta --fasta-path /path/to/input/fasta --gb_dir /path/to/GenBank/annotation
+nextflow run main.nf --ref /path/to/ref/fasta --fasta-path /path/to/input/fasta --gb_dir /path/to/GenBank/annotation --metadata /path/to/metadata
 ```
 

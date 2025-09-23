@@ -22,13 +22,15 @@ process GOFASTA_VARIANTS {
 // file format conversion. csv --> tsv
 process GOFASTA_CONVERT {
     input:
+    path aa_changes_csv
 
     output:
-    path "mutations.tsv", emit tsv
+    path "mutations.tsv", emit: mutations_tsv
 
     script:
     """
-    python gofasta_converter.py
+    echo ${params.outdir}
+    gofasta_converter.py --csv_path ${aa_changes_csv} --reference ${params.ref} --region None
     """
 
 }

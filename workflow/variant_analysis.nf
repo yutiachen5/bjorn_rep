@@ -1,3 +1,5 @@
+#!/usr/bin/env nextflow
+
 nextflow.enable.dsl=2
 
 include { DO_MINIMAP } from '../modules/alignment/main.nf'
@@ -16,8 +18,8 @@ workflow VARIANT_ANALYSIS_WORKFLOW {
         GOFASTA_VARIANTS(res_sam)
         res_csv = GOFASTA_VARIANTS.out.aa_changes_csv
 
-        // GOFASTA_CONVERT(res_csv)
-        // res_tsv = GOFASTA_CONVERT.tsv
+        GOFASTA_CONVERT(res_csv)
+        res_tsv = GOFASTA_CONVERT.out.mutations_tsv
 
 }
 

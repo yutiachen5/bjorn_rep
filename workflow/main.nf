@@ -1,23 +1,47 @@
+#!/usr/bin/env nextflow
+
 nextflow.enable.dsl=2
 
 include { SAMPLING } from '../modules/sampling/main.nf'
 include { EXTRACT_REFERENCE_GENOME } from '../modules/extract_ref_genome/main.nf'
 
 include { VARIANT_ANALYSIS_WORKFLOW } from './variant_analysis.nf'
+include { INTRAHOST_VARIANTS_WORKFLOW } from './intrahost_variants.nf' 
 
 workflow GENERAL_WORKFLOW {
+    take:
+    metadata_ch
+
     main:
         SAMPLING(params.fasta_path)
         selected_fasta = SAMPLING.out.selected_fasta
 
-        EXTRACT_REFERENCE_GENOME(params.ref)
-        ref_genome = EXTRACT_REFERENCE_GENOME.out.ref_genome
 
         if (params.run_intrahost_variants) { // false currently
             log.info "Running intrahost variant analysis"
+
+            sra_sequences_ch = metadata_ch
+                .splitCsv(header: true, sep:"\t")
+                .filter { row -> row.SraAccessions && row.SraAccessions != ""}
+                .map { row -> 
+                    def meta = [id: row.Accession, accession: row.Accession, sra_accession: row.SraAccessions]
+                    return meta 
+                }
+
+            // Intrahost variant
+            INTRAHOST_VARIANTS(
+                sra_sequences_ch,
+                Channel.value(params.ref),
+                Channel.fromPath(params.ivar_gff),  // path of gff file?
+                params.variant_threshold,
+                params.variant_min_depth
+            )
         } else {
             log.info "Skipping intrahost variant analysis"
         }
+
+        EXTRACT_REFERENCE_GENOME(params.ref)
+        ref_genome = EXTRACT_REFERENCE_GENOME.out.ref_genome
 
         log.info "Running variant analysis using consensus sequence on the whole genome"
         fasta_ch = selected_fasta

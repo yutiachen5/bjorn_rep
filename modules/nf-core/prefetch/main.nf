@@ -7,7 +7,10 @@ process SRATOOLS_PREFETCH {
     tuple val(meta), val(id)
 
     output:
-    path 
+    tuple val(meta), path(id), emit: sra
 
+    shell:
+    args = '5 1 100'
+    template('retry_with_backoff.sh')
 
 }

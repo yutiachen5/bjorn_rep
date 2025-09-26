@@ -1,5 +1,3 @@
-nextflow.enable.dsl=2
-
 // extract the ref genome from reference file
 
 process EXTRACT_REFERENCE_GENOME {
@@ -11,6 +9,7 @@ process EXTRACT_REFERENCE_GENOME {
 
     script:
     """
+    echo ${ref_genome_path}
     grep -A 1 "^>" ${ref_genome_path} > ref.fasta
     """
 }

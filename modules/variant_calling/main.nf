@@ -1,5 +1,3 @@
-nextflow.enable.dsl=2
-
 // variant calling using go_fasta, sam --> csv 
 process GOFASTA_VARIANTS {
     input:
@@ -10,11 +8,15 @@ process GOFASTA_VARIANTS {
 
     script:
     """
+    echo ${params.gff_file}
+
     gofasta sam variants \\
     -s ${alignment_sam} \\
-    -a ${params.gb_dir} \\
+    -a ${params.gff_file} \\
     --append-snps \\
     -o aa_changes.csv
+
+    cp -p aa_changes.csv ${params.outdir}/aa_changes.csv
     """
 
 }
@@ -29,8 +31,15 @@ process GOFASTA_CONVERT {
 
     script:
     """
-    echo ${params.outdir}
-    gofasta_converter.py --csv_path ${aa_changes_csv} --reference ${params.ref} --region None
+    mkdir -p ${params.outdir}
+
+    gofasta_converter.py \\
+    --csv_path ${aa_changes_csv} \\
+    --reference ${params.ref_file} \\
+    --region None \\
+    --output mutations.tsv
+
+    cp -p mutations.tsv ${params.outdir}/mutations.tsv
     """
 
 }

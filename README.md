@@ -2,32 +2,29 @@ replication of bjorn pipeline: https://github.com/andersen-lab/bjorn-general/tre
 
 current workflow:
 
-
 1. randomly sample 100 files from consensus sequence (HCoV-19: https://github.com/andersen-lab/HCoV-19-Genomics)
- - some files have the sequence split into multiple lines
- - others keep a single line
 
-2. extract reference genome from NC_045512.2
- - ref fasta downloaded from https://github.com/andersen-lab/bjorn/blob/main/data/reference.fasta (single line)
- - sequence.fasta from Karthik in slack (multiple lines)
-
-3. alignment using minimap2
+2. alignment using minimap2
+ - reference:NC_045512.2
+  - Hu-1
+  - Ba-1
 
 4. variant calling with gofasta
- - gb file downloaded from: https://github.com/andersen-lab/bjorn/blob/main/data/reference.gb
  - no option for append-codons
 
 5. file format conversion with gofasta
  - tsv file 
- - ref_nuc vs ref_codon?
 
 
-current output: /output/mutations.tsv
-
-current cmd to run:
+current cmd to run with docker:
 ```
-git clone https://github.com/andersen-lab/HCoV-19-Genomics
-cd bjorn_rep
-nextflow run main.nf --ref /path/to/ref/fasta --fasta-path /path/to/input/fasta --gb_dir /path/to/GenBank/annotation --metadata /path/to/metadata
+docker build -t bjorn .
+docker run bjorn
 ```
+
+cmd to run locally:
+```
+nextflow run main.nf --fasta_dir $PWD/data/consensus_sequences --ref_file $PWD/data/NC_045512.2.fasta --gff_file $PWD/data/NC_045512.2.gff -c nf.config
+```
+
 

@@ -1,5 +1,3 @@
-nextflow.enable.dsl=2
-
 // alignment using minimap2
 
 process DO_MINIMAP {

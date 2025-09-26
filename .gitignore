@@ -1,4 +1,5 @@
 /work
 /.nextflow
+/data/consensus_sequences
 *.txt
 *.log

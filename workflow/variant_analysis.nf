@@ -8,11 +8,10 @@ include { GOFASTA_CONVERT } from '../modules/variant_calling/main.nf'
 
 workflow VARIANT_ANALYSIS_WORKFLOW {
     take:
-        ref
         selected_fasta
 
     main:
-        DO_MINIMAP(ref, selected_fasta)
+        DO_MINIMAP(params.ref_file, selected_fasta)
         res_sam = DO_MINIMAP.out.alignment_sam
 
         GOFASTA_VARIANTS(res_sam)

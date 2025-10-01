@@ -26,6 +26,7 @@ RUN apt-get update && \
     curl \
     minimap2 \
     grep \
+    mafft \
     --no-install-recommends 
 
 # install nf
@@ -53,6 +54,7 @@ SHELL ["conda", "run", "-n", "env", "/bin/bash", "-c"]
 CMD ["nextflow", "run", "main.nf", \
     "--ref_file", "/workspace/data/NC_045512.2.fasta", \
     "--fasta_dir", "/workspace/data/consensus_sequences", \
-    "--gff_file", "/workspace/data/NC_045512.2.gff",\
+    "--gff_file", "/workspace/data/NC_045512.2.gff", \
+    "--query", "/workspace/data/BA.1_and_BA.2.fa", \
     "-c", "nf.config"]
 

@@ -1,6 +1,9 @@
 #!/usr/bin/env nextflow
+nextflow.enable.dsl=2
 
-include { GENERAL_WORKFLOW } from './workflow/main.nf'
+
+include { EXTRACT_MUTATIONS } from './workflow/main.nf'
+include { QUERY_GENOMES } from './workflow/query_genomes.nf'
 
 def validateParameters() {
     if (!params.ref_file) {
@@ -15,6 +18,9 @@ def validateParameters() {
     // if (!params.metadata) {
     //     exit 1, "Metadata not specified!"
     // }
+    if (params.translate_mutations && !params.query) {
+        exit 1, "Query genome not specified!"
+    }
 }
 
 workflow {
@@ -25,7 +31,21 @@ workflow {
     // segments_ch = Channel.empty()
 
     // metadata_ch = Channel.fromPath(params.metadata)
+    if (params.query_id == null) {
+        query_id_ch = Channel.empty()
+    } else {
+        Channel
+            .fromList(params.query_id)
+            .set { query_id_ch }
+    }
+
     metadata_ch = Channel.empty()
 
-    GENERAL_WORKFLOW(metadata_ch)
+    // EXTRACT_MUTATIONS(metadata_ch)
+
+    mutation_ch = EXTRACT_MUTATIONS(metadata_ch).mutations_tsv
+
+    if (params.translate_mutations) {
+        QUERY_GENOMES(mutation_ch, query_id_ch)
+    }
 }

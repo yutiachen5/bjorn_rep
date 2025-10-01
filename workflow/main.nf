@@ -1,14 +1,10 @@
 #!/usr/bin/env nextflow
 
-nextflow.enable.dsl=2
-
 include { SAMPLING } from '../modules/sampling/main.nf'
-// include { EXTRACT_REFERENCE_GENOME } from '../modules/extract_ref_genome/main.nf'
-
 include { VARIANT_ANALYSIS_WORKFLOW } from './variant_analysis.nf'
 include { INTRAHOST_VARIANTS_WORKFLOW } from './intrahost_variants.nf' 
 
-workflow GENERAL_WORKFLOW {
+workflow EXTRACT_MUTATIONS {
     take:
     metadata_ch
 
@@ -49,13 +45,12 @@ workflow GENERAL_WORKFLOW {
                         def trimed_filename = filename.trim()
                         file(trimed_filename).normalize() 
                         } 
-                    // .map{ filename -> 
-                    //     def trimed_filename = filename.trim()
-                    //     file("${params.fasta_path}/${trimed_filename}").normalize() 
-                    //     } 
         combined_fasta_ch = fasta_ch.collectFile() { filename ->
             ["combined.fasta", file(filename).text]
         }
 
-        VARIANT_ANALYSIS_WORKFLOW(combined_fasta_ch)
+        mutations_tsv = VARIANT_ANALYSIS_WORKFLOW(combined_fasta_ch).mutations_tsv
+
+    emit:
+    mutations_tsv
 }

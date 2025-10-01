@@ -24,7 +24,5 @@ docker run bjorn
 
 cmd to run locally:
 ```
-nextflow run main.nf --fasta_dir $PWD/data/consensus_sequences --ref_file $PWD/data/NC_045512.2.fasta --gff_file $PWD/data/NC_045512.2.gff -c nf.config
+nextflow run main.nf --fasta_dir $PWD/data/consensus_sequences --ref_file $PWD/data/NC_045512.2.fasta --gff_file $PWD/data/NC_045512.2.gff --query /home/eleanor124/projects/bjorn_rep/data/BA.1_and_BA.2.fa -c nf.config
 ```
-
-

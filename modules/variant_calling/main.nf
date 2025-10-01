@@ -8,8 +8,6 @@ process GOFASTA_VARIANTS {
 
     script:
     """
-    echo ${params.gff_file}
-
     gofasta sam variants \\
     -s ${alignment_sam} \\
     -a ${params.gff_file} \\

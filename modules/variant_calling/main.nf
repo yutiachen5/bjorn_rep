@@ -34,7 +34,7 @@ process GOFASTA_CONVERT {
     gofasta_converter.py \\
     --csv_path ${aa_changes_csv} \\
     --reference ${params.ref_file} \\
-    --region None \\
+    --region ${params.region} \\
     --output mutations.tsv
 
     cp -p mutations.tsv ${params.outdir}/mutations.tsv

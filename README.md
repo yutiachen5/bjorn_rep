@@ -5,15 +5,24 @@ current workflow:
 1. randomly sample 100 files from consensus sequence (HCoV-19: https://github.com/andersen-lab/HCoV-19-Genomics)
 
 2. alignment using minimap2
- - reference:NC_045512.2
-  - Hu-1
-  - Ba-1
+   - reference:NC_045512.2
+    - Hu-1
+    - Ba-1
 
 4. variant calling with gofasta
- - no option for append-codons
+   - no option for append-codons
 
 5. file format conversion with gofasta
- - tsv file 
+   - tsv file 
+
+6. Translate mutations from current reference genome to other reference genomes
+   - file type conversion: sam to fasta using gofasta tomultialigned
+   - [BA.1 mutations](output/NC_045512.2_BA.1_mutations.tsv)
+   - [BA.2 mutations](output/NC_045512.2_BA.2_mutations.tsv)
+   - Limitations:
+     - only works when len(bg.seq) == len(q.seq)
+     - ignoring insertions and deletions
+
 
 
 current cmd to run with docker:
@@ -24,5 +33,5 @@ docker run bjorn
 
 cmd to run locally:
 ```
-nextflow run main.nf --fasta_dir $PWD/data/consensus_sequences --ref_file $PWD/data/NC_045512.2.fasta --gff_file $PWD/data/NC_045512.2.gff --query /home/eleanor124/projects/bjorn_rep/data/BA.1_and_BA.2.fa -c nf.config
+nextflow run main.nf --fasta_dir $PWD/data/consensus_sequences --ref_file $PWD/data/NC_045512.2.fasta --gff_file $PWD/data/NC_045512.2.gff --query $PWD/data/BA.1_and_BA.2.fa --region NC_045512.2 -c nf.config 
 ```

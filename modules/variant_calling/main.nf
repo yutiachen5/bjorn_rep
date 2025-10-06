@@ -39,5 +39,4 @@ process GOFASTA_CONVERT {
 
     cp -p mutations.tsv ${params.outdir}/mutations.tsv
     """
-
 }

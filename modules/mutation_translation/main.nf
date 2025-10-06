@@ -2,7 +2,7 @@
 
 process TRANSLATE_MUTATIONS {
     input:
-    path mafft_fasta
+    path alignment_fasta
     path mutations_tsv
     val query_id
 
@@ -12,11 +12,12 @@ process TRANSLATE_MUTATIONS {
     script:
     """
     translate_mutations.py \
-        -a ${mafft_fasta} \
-        -o mutations.tsv \
+        -a ${alignment_fasta} \
         -m ${mutations_tsv} \
+        --gff ${params.gff_file} \
         --query ${query_id} \
-        --ref ${params.ref_id}
+        --bg ${params.ref_id} \
+        -o mutations.tsv 
     cp -p ${query_id}_mutations.tsv ${params.outdir}/${query_id}_mutations.tsv
     """
 }

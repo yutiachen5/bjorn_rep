@@ -56,5 +56,6 @@ CMD ["nextflow", "run", "main.nf", \
     "--fasta_dir", "/workspace/data/consensus_sequences", \
     "--gff_file", "/workspace/data/NC_045512.2.gff", \
     "--query", "/workspace/data/BA.1_and_BA.2.fa", \
+    "--region", "NC_045512.2", \
     "-c", "nf.config"]
 

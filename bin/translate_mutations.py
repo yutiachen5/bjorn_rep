@@ -1,76 +1,146 @@
 #!/usr/bin/env python
 
-import os
-import pandas as pd
+import re
 import argparse
 import polars as pl
 from Bio import SeqIO
 
+pl.Config.set_tbl_cols(-1)      
+
 def extract_variants(args):
-    # background genome should be put at the first line of this file
     records = list(SeqIO.parse(args["a"], "fasta"))
 
-    ids = [args["ref"], args["query"]]
+    seq_len = set([len(record.seq) for record in records])
+    assert len(seq_len) == 1, "Length of sequences mismatch!"
+
+    ids = [args["bg"], args["query"]]
     rec_dic = {record.id: record.seq for record in records if record.id in ids}
-    seq_len = set([len(record.seq) for record in records if record.id in ids])
 
-    assert len(seq_len) == 1, "Alignment length mismatch" # currently only for the case when all genome havce the same length
-
-    n = seq_len.pop()
-    variants = [] # {"pos":int, "gid1":str, ...}
-
-    for i in range(n):
-        nuc = {sid: seq[i].upper() for sid, seq in rec_dic.items()} 
-        if len(set(nuc.values())) > 1: # mismatch
-            row = {"pos": i+1} # 1-based idx
-            row.update(nuc)
-            variants.append(row)
+    variants = []
+    for i in range(seq_len.pop()): 
+        if rec_dic[args["bg"]][i] != rec_dic[args["query"]][i]:
+            variants.append({"pos": i+1, "bg.ref":rec_dic[args["bg"]][i], "q.ref":rec_dic[args["query"]][i]}) # 1-based index
 
     return pl.DataFrame(variants)
 
-def derive_mutations(variants, args):
+def parse_gff(args):
+    gff = []
+    with open(args["gff"]) as gfile:
+        for line in gfile:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            cols = line.split("\t")
+            if len(cols) != 9:
+                continue
+            if cols[2] == 'CDS': # gff only, ID=id-YP_009724389.1:5325..5925
+                region = cols[0]
+                start, end = int(cols[3]), int(cols[4])
+                gff_feature = re.search(r"YP_\d+\.\d+", cols[-1]).group() 
+                gff.append({"region":region, "start": start, "end": end, "GFF_FEATURE": gff_feature})
+    return pl.DataFrame(gff)
+
+def translate_mutations(args):
+    variants = extract_variants(args)
     mutation = pl.read_csv(args["m"], separator="\t", has_header=True)
-    dftmp = variants.select(
-        ["pos", args["ref"], args["query"]]
-    ).filter(
-        pl.col(args["ref"]) != pl.col(args["query"])
+    sample_id = mutation.select(pl.col("sra").unique())
+    gff = parse_gff(args)
+
+    both = (pl.col("sra").is_not_null()) & (pl.col("bg.ref").is_not_null())
+    left_only = (pl.col("sra").is_not_null()) & (pl.col("bg.ref").is_null())
+    right_only = (pl.col("sra").is_null()) & (pl.col("bg.ref").is_not_null())
+
+    merged = mutation.join(variants, on="pos", how="full") # left: mutation, right: variants
+
+    assert (merged.filter(both).select((pl.col("bg.ref") == pl.col("ref")).all()).item()), "Mismatch between ref nucs!"
+    assert (merged.select((pl.col("ref") != pl.col("alt")).all()).item()), "ref shouldn't match alt in mutation file!"
+
+    merged = merged.rename({"ref": "old_ref", "alt": "old_alt"})   
+                
+    # case1: both & bg.alt == q.ref, rm
+    # case2: both & bg.alt != q.ref & bg.alt != bg.ref, update: ref = q.ref
+    # case3: variants only (bg.alt == bg.ref != r.ref), add: ref = q.ref, alt = bg.ref 
+    # case4: mutation only (bg.ref == q.ref), keep: ref = old_ref, alt = old_alt
+
+    res = (
+        merged.with_columns(
+            # case1
+            pl.when(both & (pl.col("old_alt") == pl.col("q.ref")))
+                .then(None)
+
+            # case2
+            .when(both & (pl.col("old_alt") != pl.col("q.ref")))
+                .then(pl.struct([pl.col("q.ref").alias("ref"),
+                                 pl.col("old_alt").alias("alt")]))
+            # case3
+            .when(right_only)
+                .then(pl.struct([pl.col("q.ref").alias("ref"),
+                                 pl.col("bg.ref").alias("alt")]))
+            # case4
+            .when(left_only)
+                .then(pl.struct([pl.col("old_ref").alias("ref"),
+                                 pl.col("old_alt").alias("alt")]))
+            .otherwise(None)  
+            .alias("case"),
+            pl.coalesce([pl.col("pos"), pl.col("pos_right")]).alias("pos")
+        )
+        .filter(pl.col("case").is_not_null())
+        .drop(["q.ref", "old_ref", "old_alt", "pos_right"])      
+        .unnest("case")          
+        .sort("pos")
     )
 
-    merged = dftmp.join(mutation, on='pos', how='right')
+    assert merged.filter(both).select((pl.col("pos") == pl.col("pos_right")).all()).item(), "mismatch between pos!"
 
-    # if bg_genome.alt = alt_genome.ref: no mutation, rm the line
-    # else: different mutation, change ref nuc
-    merged = (merged.with_columns(
-        pl.when(pl.col("alt") == pl.col(args["query"]))
-            .then(None)
-            .otherwise(pl.col("alt"))
-            .alias("alt"),
+    # for the records missing sample information, do the cross join to append all the sample for each position
+    variants_only = res.filter(right_only)
+    mutation_both = res.filter(~right_only)
 
-        pl.when(pl.col("alt") != pl.col(args["query"]))
-            .then(pl.col(args["query"]))
-            .otherwise(pl.col("ref"))
-            .alias("ref")
+    variants_sample = variants_only.join(sample_id, how="cross")
+    variants_sample = (
+        variants_sample.sort("pos")
+            .join_asof(
+                gff.sort("start"),
+                left_on="pos",
+                right_on="start",
+                strategy="backward"
+            )
+            .with_columns(
+                pl.when(pl.col("pos") < pl.col("end"))
+                .then(pl.col("GFF_FEATURE_right"))
+                .otherwise(pl.col("GFF_FEATURE"))
+                .alias("GFF_FEATURE")
+            )
+            .with_columns([
+                pl.coalesce([pl.col("sra"), pl.col("sra_right")]).alias("sra"),
+                pl.coalesce([pl.col("region"), pl.col("region_right")]).alias("region")
+            ])
+            .drop(["sra_right", "start", "end", "GFF_FEATURE_right", "region_right"])
     )
-    .filter(pl.col("alt").is_not_null())
-    .drop([args["ref"], args["query"]])
-    .sort("pos")
+
+    final = (
+        pl.concat([variants_sample, mutation_both])
+                .drop(["bg.ref"])
+                .sort("pos")
     )
 
-    merged.write_csv(args["query"]+"_"+args["o"], separator="\t")
 
+    final.write_csv(args["query"]+"_"+args["o"], separator="\t")
+
+    # final.write_csv("tmp.tsv", separator="\t")
 
 def main():
     parser = argparse.ArgumentParser(description="Extract differences between Hu-1 and other references to infer mutations on other refences.")
     parser.add_argument("-m", help="Mutation file path in TSV format.", required=True)
-    parser.add_argument("-a", help="Alignment file from mafft.", required=True)
-    parser.add_argument("-o", help="Output diractory for new mutation file.")
-    parser.add_argument("--ref", help="ID of refence genome", required=True)
-    parser.add_argument("--query", help="ID of query genom", required=True)
+    parser.add_argument("-a", help="Alignment file path from gofasta in FASTA format, including bakground genome and query genomes.", required=True)
+    parser.add_argument("--gff", help="GFF file to extract gene features and sra.", required=True)
+    parser.add_argument("-o", help="Output name for new mutation file in TSV format.", default="mutations.tsv")
+    parser.add_argument("--bg", help="ID of background genome", required=True, type=str)
+    parser.add_argument("--query", help="ID of query genom", required=True, type=str)
     args = vars(parser.parse_args())
 
-    variants = extract_variants(args)
-    derive_mutations(variants, args)
+    translate_mutations(args)
 
     
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

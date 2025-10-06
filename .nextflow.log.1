@@ -1,0 +1,122 @@
+Oct-06 15:57:40.841 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf --ref_file /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.fasta --gff_file /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.gff --fasta_dir /home/eleanor124/projects/bjorn_rep/data/consensus_sequences/ --region NC_045512.2 --query /home/eleanor124/projects/bjorn_rep/data/BA.1_and_BA.2.fa -c nf.config
+Oct-06 15:57:40.968 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.7
+Oct-06 15:57:41.024 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/eleanor124/.nextflow/plugins; core-plugins: nf-amazon@2.15.0-patch1,nf-azure@1.16.0-patch1,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.1,nf-k8s@1.0.0,nf-tower@1.11.4-patch1,nf-wave@1.12.1
+Oct-06 15:57:41.086 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Oct-06 15:57:41.089 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Oct-06 15:57:41.094 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Oct-06 15:57:41.120 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Oct-06 15:57:41.179 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /home/eleanor124/projects/bjorn_rep/nf.config
+Oct-06 15:57:41.184 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/eleanor124/projects/bjorn_rep/nf.config
+Oct-06 15:57:41.255 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/eleanor124/.nextflow/secrets/store.json
+Oct-06 15:57:41.266 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@35e478f] - activable => nextflow.secret.LocalSecretsProvider@35e478f
+Oct-06 15:57:41.309 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-06 15:57:43.337 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Oct-06 15:57:43.400 [main] DEBUG nextflow.cli.CmdRun - Launching `main.nf` [soggy_curran] DSL2 - revision: 5e7157aae0
+Oct-06 15:57:43.408 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Oct-06 15:57:43.410 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Oct-06 15:57:43.596 [main] DEBUG nextflow.Session - Session UUID: cac9327b-967d-4f63-aab0-884345cd019f
+Oct-06 15:57:43.597 [main] DEBUG nextflow.Session - Run name: soggy_curran
+Oct-06 15:57:43.599 [main] DEBUG nextflow.Session - Executor pool size: 20
+Oct-06 15:57:43.620 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Oct-06 15:57:43.640 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=60; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-06 15:57:43.733 [main] DEBUG nextflow.cli.CmdRun - 
+  Version: 25.04.7 build 5955
+  Created: 08-09-2025 13:29 UTC (06:29 PDT)
+  System: Linux 6.6.87.2-microsoft-standard-WSL2
+  Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 17.0.16+8-Ubuntu-0ubuntu124.04.1
+  Encoding: UTF-8 (UTF-8)
+  Process: 71481@Eleanor [127.0.1.1]
+  CPUs: 20 - Mem: 7.6 GB (4.1 GB) - Swap: 2 GB (1.5 GB)
+Oct-06 15:57:43.811 [main] DEBUG nextflow.Session - Work-dir: /home/eleanor124/projects/bjorn_rep/work [ext2/ext3]
+Oct-06 15:57:43.897 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Oct-06 15:57:43.934 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Oct-06 15:57:43.956 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Oct-06 15:57:44.016 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Oct-06 15:57:44.046 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 21; maxThreads: 1000
+Oct-06 15:57:44.227 [main] DEBUG nextflow.Session - Session start
+Oct-06 15:57:44.887 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Oct-06 15:57:47.237 [main] INFO  nextflow.Nextflow - Start consensus genome alignment..
+Oct-06 15:57:47.710 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-06 15:57:47.713 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-06 15:57:47.731 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Oct-06 15:57:47.754 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=20; memory=7.6 GB; capacity=20; pollInterval=100ms; dumpInterval=5m
+Oct-06 15:57:47.764 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Oct-06 15:57:47.860 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:SAMPLING': maxForks=0; fair=false; array=0
+Oct-06 15:57:48.012 [main] INFO  nextflow.Nextflow - Skipping intrahost variant analysis
+Oct-06 15:57:48.020 [main] INFO  nextflow.Nextflow - Running variant analysis using consensus sequence on the whole genome
+Oct-06 15:57:48.246 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-06 15:57:48.248 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-06 15:57:48.256 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:DO_MINIMAP': maxForks=0; fair=false; array=0
+Oct-06 15:57:48.281 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-06 15:57:48.286 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-06 15:57:48.291 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_VARIANTS': maxForks=0; fair=false; array=0
+Oct-06 15:57:48.319 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-06 15:57:48.320 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-06 15:57:48.322 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_CONVERT': maxForks=0; fair=false; array=0
+Oct-06 15:57:48.358 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-06 15:57:48.358 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-06 15:57:48.369 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'QUERY_GENOMES:DO_MINIMAP': maxForks=0; fair=false; array=0
+Oct-06 15:57:48.452 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-06 15:57:48.453 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-06 15:57:48.470 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'QUERY_GENOMES:GOFASTA_ALIGNMENT': maxForks=0; fair=false; array=0
+Oct-06 15:57:48.644 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-06 15:57:48.650 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-06 15:57:48.655 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'QUERY_GENOMES:TRANSLATE_MUTATIONS': maxForks=0; fair=false; array=0
+Oct-06 15:57:48.694 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: SAMPLING, EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_CONVERT, SRATOOLS_PREFETCH, QUERY_GENOMES:DO_MINIMAP, QUERY_GENOMES:GOFASTA_ALIGNMENT, EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:DO_MINIMAP, EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_VARIANTS, TRANSLATE_MUTATIONS, EXTRACT_MUTATIONS:SAMPLING, QUERY_GENOMES:TRANSLATE_MUTATIONS, MAFFT, GOFASTA_CONVERT, GOFASTA_VARIANTS, DO_MINIMAP, GOFASTA_ALIGNMENT
+Oct-06 15:57:48.702 [main] DEBUG nextflow.Session - Igniting dataflow network (9)
+Oct-06 15:57:48.704 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:SAMPLING
+Oct-06 15:57:48.707 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:DO_MINIMAP
+Oct-06 15:57:48.711 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_VARIANTS
+Oct-06 15:57:48.714 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_CONVERT
+Oct-06 15:57:48.718 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > QUERY_GENOMES:DO_MINIMAP
+Oct-06 15:57:48.721 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > QUERY_GENOMES:GOFASTA_ALIGNMENT
+Oct-06 15:57:48.733 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > QUERY_GENOMES:TRANSLATE_MUTATIONS
+Oct-06 15:57:48.741 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_20b3d3388e31f29c: /home/eleanor124/projects/bjorn_rep/workflow/variant_analysis.nf
+  Script_a2a05f6897b75cec: /home/eleanor124/projects/bjorn_rep/modules/variant_calling/main.nf
+  Script_58924528a3cfc3d6: /home/eleanor124/projects/bjorn_rep/modules/sampling/main.nf
+  Script_b48e0f3db1ef262f: /home/eleanor124/projects/bjorn_rep/workflow/query_genomes.nf
+  Script_a81aff19e6fe1d7d: /home/eleanor124/projects/bjorn_rep/modules/mutation_translation/main.nf
+  Script_c9989a06a3da72aa: /home/eleanor124/projects/bjorn_rep/workflow/main.nf
+  Script_48fcb54b016ad5bf: /home/eleanor124/projects/bjorn_rep/modules/nf-core/prefetch/main.nf
+  Script_49a191c2c353bde7: /home/eleanor124/projects/bjorn_rep/main.nf
+  Script_feeb22a1a48ba201: /home/eleanor124/projects/bjorn_rep/workflow/intrahost_variants.nf
+  Script_3ee92d01285d2dda: /home/eleanor124/projects/bjorn_rep/modules/alignment/main.nf
+Oct-06 15:57:48.742 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Oct-06 15:57:48.743 [main] DEBUG nextflow.Session - Session await
+Oct-06 15:57:49.188 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:49.197 [Task submitter] INFO  nextflow.Session - [85/32ebfd] Submitted process > QUERY_GENOMES:DO_MINIMAP
+Oct-06 15:57:49.244 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:49.246 [Task submitter] INFO  nextflow.Session - [1e/d8bcaa] Submitted process > EXTRACT_MUTATIONS:SAMPLING
+Oct-06 15:57:49.344 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: QUERY_GENOMES:DO_MINIMAP; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/85/32ebfd7b938c149cab75933bb3f16a]
+Oct-06 15:57:49.346 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=60; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-06 15:57:49.453 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:49.458 [Task submitter] INFO  nextflow.Session - [99/c5365a] Submitted process > QUERY_GENOMES:GOFASTA_ALIGNMENT
+Oct-06 15:57:49.766 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: QUERY_GENOMES:GOFASTA_ALIGNMENT; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/99/c5365a624a08e3322252f435f68d70]
+Oct-06 15:57:51.197 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: EXTRACT_MUTATIONS:SAMPLING; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/1e/d8bcaa43b3fdc34127c1e8586926ea]
+Oct-06 15:57:52.160 [Actor Thread 6] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 100; slices: 1; internal sort time: 0.408 s; external sort time: 0.007 s; total time: 0.415 s
+Oct-06 15:57:52.198 [Actor Thread 6] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /home/eleanor124/projects/bjorn_rep/work/collect-file/0c23243784b65c8f691018aba7472281
+Oct-06 15:57:52.208 [Actor Thread 6] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /tmp/nxf-15778698459671681250
+Oct-06 15:57:52.214 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:52.215 [Task submitter] INFO  nextflow.Session - [dc/0cc877] Submitted process > EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:DO_MINIMAP (1)
+Oct-06 15:57:52.595 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:DO_MINIMAP (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/dc/0cc8772d9b087018a50ef99c7c01bb]
+Oct-06 15:57:52.627 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:52.629 [Task submitter] INFO  nextflow.Session - [6e/16ec1a] Submitted process > EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_VARIANTS (1)
+Oct-06 15:57:55.139 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_VARIANTS (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/6e/16ec1a15215fb4850c71a78250873a]
+Oct-06 15:57:55.177 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:55.178 [Task submitter] INFO  nextflow.Session - [ff/963560] Submitted process > EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_CONVERT (1)
+Oct-06 15:57:57.155 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 6; name: EXTRACT_MUTATIONS:VARIANT_ANALYSIS_WORKFLOW:GOFASTA_CONVERT (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/ff/9635606799be284a662f37ef7a3199]
+Oct-06 15:57:57.181 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:57.182 [Task submitter] INFO  nextflow.Session - [78/65441e] Submitted process > QUERY_GENOMES:TRANSLATE_MUTATIONS (2)
+Oct-06 15:57:57.186 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-06 15:57:57.187 [Task submitter] INFO  nextflow.Session - [22/de41c4] Submitted process > QUERY_GENOMES:TRANSLATE_MUTATIONS (1)
+Oct-06 15:57:57.861 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 7; name: QUERY_GENOMES:TRANSLATE_MUTATIONS (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/22/de41c4747895476d868510df9bc597]
+Oct-06 15:57:57.864 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 8; name: QUERY_GENOMES:TRANSLATE_MUTATIONS (2); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/78/65441e5a1536e1843a67b924a195aa]
+Oct-06 15:57:57.867 [main] DEBUG nextflow.Session - Session await > all processes finished
+Oct-06 15:57:57.964 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Oct-06 15:57:57.965 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Oct-06 15:57:57.972 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Oct-06 15:57:57.990 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=8; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=8s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=2; peakCpus=2; peakMemory=0; ]
+Oct-06 15:57:58.051 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Oct-06 15:57:58.073 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Oct-06 15:57:58.075 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

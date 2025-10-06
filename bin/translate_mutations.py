@@ -125,9 +125,8 @@ def translate_mutations(args):
     )
 
 
-    final.write_csv(args["query"]+"_"+args["o"], separator="\t")
+    final.write_csv(args["query"]+"_"+args["o"], separator="\t", include_header=True)
 
-    # final.write_csv("tmp.tsv", separator="\t")
 
 def main():
     parser = argparse.ArgumentParser(description="Extract differences between Hu-1 and other references to infer mutations on other refences.")

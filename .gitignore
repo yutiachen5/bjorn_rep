@@ -2,5 +2,6 @@
 /.nextflow
 /data/consensus_sequences
 /data/testing
+/output/BA
 *.txt
 *.log

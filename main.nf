@@ -1,9 +1,7 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2
 
-
 include { EXTRACT_MUTATIONS } from './workflow/main.nf'
-include { QUERY_GENOMES } from './workflow/query_genomes.nf'
 
 def validateParameters() {
     if (!params.ref_file) {
@@ -45,7 +43,4 @@ workflow {
 
     mutation_ch = EXTRACT_MUTATIONS(metadata_ch).mutations_tsv
 
-    if (params.translate_mutations) {
-        QUERY_GENOMES(mutation_ch, query_id_ch)
-    }
 }

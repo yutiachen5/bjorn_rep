@@ -1,29 +1,47 @@
 #!/usr/bin/env python
 
 import os
+import pandas as pd
 import random
 import argparse
 
 
-def sampling(fasta_dir, n):
-    all_samples = [os.path.join(fasta_dir, f) \
-                    for f in os.listdir(fasta_dir) if os.path.isfile(os.path.join(fasta_dir, f))]
-    selected_fasta = random.sample(all_samples, min(n, len(all_samples)))
+def sampling(args):
+    # select samples from certain lineage
+    if getattr(args, "l", None):
+        df = pd.read_csv(args.lineage_file)
+        df["prefix"] = df['lineage'].str.extract("([A-Za-z]+)(?=\.\d+)")
+        df["prefix"] = df["prefix"].fillna(df["lineage"])
+        selected_fasta = list(df.loc[df["prefix"] == args.l, :]["taxon"])
 
-    with open("selected_fasta.txt", "w") as out:
-        for f in selected_fasta:
-            out.write(f + "\n")
+        with open("selected_fasta.txt", "w") as out:
+            for f in selected_fasta:
+                if os.path.isfile(os.path.join(args.fasta_dir, f+".fasta")):
+                    path = os.path.join(args.fasta_dir, f+".fasta") 
+                    out.write(path + "\n")
+    # random sampling
+    else:
+        all_samples = [os.path.join(args.fasta_dir, f) \
+                        for f in os.listdir(args.fasta_dir) if os.path.isfile(os.path.join(args.fasta_dir, f))]
+        selected_fasta = random.sample(all_samples, min(args.n, len(all_samples)))
+
+        with open("selected_fasta.txt", "w") as out:
+            for f in selected_fasta:
+                out.write(f + "\n")
     
 def main():
     parser = argparse.ArgumentParser(description="Randomly select n samples from all input fasta files.")
     parser.add_argument("--fasta_dir", help="Input fasta dir", required=True)
-    # parser.add_argument("--output", default="mutations.tsv", help="Output TSV file name.")
-    parser.add_argument("-n", default=100, help="Number of samples.")
+    parser.add_argument("-n", help="Number of samples.", default=100, type=int)
+    parser.add_argument("-l", type=str, help="Lineage name for extracting mutations.")
+    parser.add_argument("--lineage_file", help="Lineage file in CVS format.")
 
     args = parser.parse_args()
 
-    selected_fasta_ls = sampling(args.fasta_dir, args.n)
+    sampling(args)
 
 if __name__ == "__main__":
     main() 
 
+# cmd for testing locally
+# python /home/eleanor124/projects/bjorn_rep/bin/sampling.py --lineage_file /home/eleanor124/projects/HCoV-19-Genomics/lineage_report.csv -l BA --fasta_dir /home/eleanor124/projects/HCoV-19-Genomics/consensus_sequences/

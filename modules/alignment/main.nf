@@ -1,6 +1,6 @@
 // alignment using minimap2
 
-process DO_MINIMAP {
+process MINIMAP {
     input:
     path ref_genome
     path query_seq
@@ -30,7 +30,9 @@ process MAFFT {
     script:
     """
     cat ${ref_genome} ${query_genome} > cat_tmp.fasta
+    
     mafft cat_tmp.fasta > mafft_alignment.fasta
+
     seqkit seq -w 0 mafft_alignment.fasta > mafft.fasta
     """
 }
@@ -46,9 +48,11 @@ process GOFASTA_ALIGNMENT {
     script:
     """
     gofasta sam toMultiAlign -s ${alignment_sam} \\
-                             -o alignment_tmp.fasta
-    cat alignment_tmp.fasta ${ref_genome} > alignment_ref.fasta  
-    seqkit seq -w 0 alignment_ref.fasta > alignment.fasta                      
+                             -o alignment_samples.fasta
+
+    cat ${ref_genome} alignment_samples.fasta > alignment_ref_samples.fasta 
+
+    seqkit seq -w 0 alignment_ref_samples.fasta > alignment.fasta                      
     """
 }
 

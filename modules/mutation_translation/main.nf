@@ -18,6 +18,7 @@ process TRANSLATE_MUTATIONS {
         --query ${query_id} \
         --bg ${params.ref_id} \
         -o mutations.tsv 
+        
     cp -p ${query_id}_mutations.tsv ${params.outdir}/${query_id}_mutations.tsv
     """
 }

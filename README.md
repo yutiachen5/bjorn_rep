@@ -23,7 +23,7 @@ current workflow:
      - only works when len(bg.seq) == len(q.seq)
      - ignoring insertions and deletions
 
-
+7. Run pipeline on on BA samples (38901 in total)
 
 current cmd to run with docker:
 ```
@@ -31,7 +31,28 @@ docker build -t bjorn .
 docker run bjorn
 ```
 
-cmd to run locally:
+for all BA samples:
 ```
-nextflow run main.nf --fasta_dir $PWD/data/consensus_sequences --ref_file $PWD/data/NC_045512.2.fasta --gff_file $PWD/data/NC_045512.2.gff --query $PWD/data/BA.1_and_BA.2.fa --region NC_045512.2 -c nf.config 
+nextflow run main.nf \
+   --fasta_dir $PWD/data/consensus_sequences \
+   --ref_file $PWD/data/NC_045512.2.fasta \
+   --gff_file $PWD/data/NC_045512.2.gff \
+   --query $PWD/data/BA.1_and_BA.2.fa \
+   --region NC_045512.2 \
+   --lineage_file $PWD/data/lineage_report.csv \
+   --l BA \
+   -c nf.config 
+
 ```
+
+100 samples from random selection:
+```
+nextflow run main.nf \
+   --fasta_dir $PWD/data/consensus_sequences \
+   --ref_file $PWD/data/NC_045512.2.fasta \
+   --gff_file $PWD/data/NC_045512.2.gff \
+   --query $PWD/data/BA.1_and_BA.2.fa \
+   --region NC_045512.2 \
+   -c nf.config 
+```
+

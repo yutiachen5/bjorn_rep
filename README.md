@@ -2,28 +2,23 @@ replication of bjorn pipeline: https://github.com/andersen-lab/bjorn-general/tre
 
 current workflow:
 
-1. randomly sample 100 files from consensus sequence (HCoV-19: https://github.com/andersen-lab/HCoV-19-Genomics)
+1. extract data from consensus sequence (HCoV-19: https://github.com/andersen-lab/HCoV-19-Genomics)
 
 2. alignment using minimap2
    - reference:NC_045512.2
     - Hu-1
     - Ba-1
 
-4. variant calling with gofasta
-   - no option for append-codons
+3. mutation calling 
+   - gofasta sam variants
+   - manual calling
 
-5. file format conversion with gofasta
-   - tsv file 
-
-6. Translate mutations from current reference genome to other reference genomes
-   - file type conversion: sam to fasta using gofasta tomultialigned
+4. Translate mutations from current reference genome to other reference genomes
    - [BA.1 mutations](output/NC_045512.2_BA.1_mutations.tsv)
    - [BA.2 mutations](output/NC_045512.2_BA.2_mutations.tsv)
    - Limitations:
      - only works when len(bg.seq) == len(q.seq)
-     - ignoring insertions and deletions
 
-7. Run pipeline on on BA samples (38901 in total)
 
 current cmd to run with docker:
 ```
@@ -53,6 +48,7 @@ nextflow run main.nf \
    --gff_file $PWD/data/NC_045512.2.gff \
    --query $PWD/data/BA.1_and_BA.2.fa \
    --region NC_045512.2 \
-   -c nf.config 
+   -c nf.config \
+   -with-timeline /home/eleanor124/projects/bjorn_rep/output/timeline.html
 ```
 

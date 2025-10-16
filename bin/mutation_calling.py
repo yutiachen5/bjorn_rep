@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import re
+import csv
 import argparse
 from Bio import SeqIO
 import pandas as pd
@@ -23,84 +24,57 @@ def parse_gff(gff_path):
 
     return pl.DataFrame(gff)
 
-
+def get_gff_feature(pos, gff):
+    match = gff.filter((pl.col("start") <= pos) & (pos <= pl.col("end")))
+    if match.height > 0:
+        return match[0, "GFF_FEATURE"]
+    else:
+        return ""
+    
 def mutation_calling(args):
     records = list(SeqIO.parse(args.a, "fasta"))
+    gff = parse_gff(args.gff)
     
     seq_len = [len(record.seq) for record in records]
     assert len(set(seq_len)) == 1, "Sequence lengths mismatch!"
 
     length = seq_len.pop()
 
-    mutations = []
-    for record in records[1:]:
-        # mut_type: "<type>:<start>:<length>"
+    with open(args.o, "w", newline="") as outfile:
+        header = ["sra", "region", "pos", "ref", "alt", "GFF_FEATURE", "mut_len"]
+        outfile.write("\t".join(header) + "\n")
 
-        i = 0
+        for record in records[1:]:
+            i = 0
 
-        ref_seq = str(records[0].seq)
-        alt_seq = str(record.seq)
+            ref_seq = str(records[0].seq)
+            alt_seq = str(record.seq)
 
-        while i < length:
-            if ref_seq[i] != alt_seq[i]:
-                if alt_seq[i] == "-": # del
-                    j = i
-                    while j + 1 < length and alt_seq[j+1] == "-":
-                        j += 1
-                    deleted = ref_seq[i:j+1]
-                    mutations.append({"sra": record.id, "region": args.region, "pos": i+1, "ref": ref_seq[i], "alt": "-" + deleted, "mut_len": len(deleted)})
+            while i < length:
+                if ref_seq[i] != alt_seq[i]:
+                    gff_feature = get_gff_feature(i+1, gff)
+                    if alt_seq[i] == "-": # del
+                        j = i
+                        while j + 1 < length and alt_seq[j+1] == "-":
+                            j += 1
+                        deleted = ref_seq[i:j+1]
+                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t-{deleted}\t{gff_feature}\t{len(deleted)}\n")
 
-                    i = j+1
-                    continue
-                elif ref_seq[i] == "-": # ins
-                    j = i
-                    while j + 1 < length and ref_seq[j+1] == "-":
-                        j += 1
-                    inserted = alt_seq[i:j+1]
-                    mutations.append({"sra": record.id, "region": args.region, "pos": i+1, "ref": ref_seq[i], "alt": "+" + inserted, "mut_len": len(inserted)})
+                        i = j+1
+                        continue
+                    elif ref_seq[i] == "-": # ins
+                        j = i
+                        while j + 1 < length and ref_seq[j+1] == "-":
+                            j += 1
+                        inserted = alt_seq[i:j+1]
+                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t{gff_feature}\t{len(inserted)}\n")
 
-                    i = j+1
-                    continue
-                else: # snp
-                    mutations.append({"sra": record.id, "region": args.region, "pos": i+1, "ref": ref_seq[i], "alt": alt_seq[i], "mut_len": 1})
-            i += 1
-
-    schema = {
-        "sra": pl.Utf8,
-        "region": pl.Utf8,
-        "pos": pl.Int64,
-        "ref": pl.Utf8,
-        "alt": pl.Utf8,
-        "mut_len": pl.Int64,
-    }
-    mutations = pl.DataFrame(mutations, schema=schema)
-    gff = parse_gff(args.gff)
-
-    mutations = (
-        mutations.sort("pos")
-            .join_asof(
-                gff.sort("start"),
-                left_on="pos",
-                right_on="start",
-                strategy="backward" # pos in variants_sample was matched with the closet start position from gff, where pos>start
-            )
-            .with_columns(
-                pl.when(pl.col("pos") < pl.col("end"))
-                .then(pl.col("GFF_FEATURE"))
-                .otherwise(None)
-                .alias("GFF_FEATURE")
-            )
-            .with_columns([
-                pl.lit(None).alias("ref_codon"),
-                pl.lit(None).alias("alt_codon"),
-                pl.lit(None).alias("ref_aa"),
-                pl.lit(None).alias("alt_aa"),
-                pl.lit(None).alias("pos_aa")
-            ])
-            .drop(["start", "end"])
-    )
+                        i = j+1
+                        continue
+                    else: # snp
+                        outfile.write(f"{record.id}\t{args.region}\t{int(i+1)}\t{ref_seq[i]}\t{alt_seq[i]}\t{gff_feature}\t1\n") 
+                i += 1
     
-    mutations.write_csv(args.o, separator="\t", include_header=True)
 
 
 def main():

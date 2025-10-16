@@ -1,251 +1,124 @@
-Oct-13 14:02:39.575 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf --fasta_dir /home/eleanor124/projects/bjorn_rep/data/consensus_sequences --ref_file /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.fasta --gff_file /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.gff --query /home/eleanor124/projects/bjorn_rep/data/BA.1_and_BA.2.fa --region NC_045512.2 -c nf.config
-Oct-13 14:02:39.644 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.7
-Oct-13 14:02:39.679 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/eleanor124/.nextflow/plugins; core-plugins: nf-amazon@2.15.0-patch1,nf-azure@1.16.0-patch1,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.1,nf-k8s@1.0.0,nf-tower@1.11.4-patch1,nf-wave@1.12.1
-Oct-13 14:02:39.709 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
-Oct-13 14:02:39.710 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
-Oct-13 14:02:39.713 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
-Oct-13 14:02:39.726 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
-Oct-13 14:02:39.767 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /home/eleanor124/projects/bjorn_rep/nf.config
-Oct-13 14:02:39.770 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/eleanor124/projects/bjorn_rep/nf.config
-Oct-13 14:02:39.805 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/eleanor124/.nextflow/secrets/store.json
-Oct-13 14:02:39.810 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@35e478f] - activable => nextflow.secret.LocalSecretsProvider@35e478f
-Oct-13 14:02:39.825 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
-Oct-13 14:02:40.305 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
-Oct-13 14:02:40.320 [main] DEBUG nextflow.cli.CmdRun - Launching `main.nf` [lonely_yalow] DSL2 - revision: e78b6b02dd
-Oct-13 14:02:40.322 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
-Oct-13 14:02:40.322 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
-Oct-13 14:02:40.378 [main] DEBUG nextflow.Session - Session UUID: 25b81d1b-b415-4309-a2db-dd860c7d265e
-Oct-13 14:02:40.378 [main] DEBUG nextflow.Session - Run name: lonely_yalow
-Oct-13 14:02:40.378 [main] DEBUG nextflow.Session - Executor pool size: 22
-Oct-13 14:02:40.385 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
-Oct-13 14:02:40.392 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=66; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
-Oct-13 14:02:40.424 [main] DEBUG nextflow.cli.CmdRun - 
+Oct-16 12:08:52.451 [main] DEBUG nextflow.cli.Launcher - $> nextflow run main.nf --fasta_dir /home/eleanor124/projects/bjorn_rep/data/consensus_sequences --ref_file /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.fasta --gff_file /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.gff --query /home/eleanor124/projects/bjorn_rep/data/BA.1_and_BA.2.fa --region NC_045512.2 -c nf.config --outdir /home/eleanor124/projects/bjorn_rep/output/ -with-timeline /home/eleanor124/projects/bjorn_rep/output/timeline.html
+Oct-16 12:08:52.522 [main] DEBUG nextflow.cli.CmdRun - N E X T F L O W  ~  version 25.04.7
+Oct-16 12:08:52.544 [main] DEBUG nextflow.plugin.PluginsFacade - Setting up plugin manager > mode=prod; embedded=false; plugins-dir=/home/eleanor124/.nextflow/plugins; core-plugins: nf-amazon@2.15.0-patch1,nf-azure@1.16.0-patch1,nf-cloudcache@0.4.3,nf-codecommit@0.2.3,nf-console@1.2.1,nf-google@1.21.1,nf-k8s@1.0.0,nf-tower@1.11.4-patch1,nf-wave@1.12.1
+Oct-16 12:08:52.563 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Enabled plugins: []
+Oct-16 12:08:52.564 [main] INFO  o.pf4j.DefaultPluginStatusProvider - Disabled plugins: []
+Oct-16 12:08:52.566 [main] INFO  org.pf4j.DefaultPluginManager - PF4J version 3.12.0 in 'deployment' mode
+Oct-16 12:08:52.577 [main] INFO  org.pf4j.AbstractPluginManager - No plugins
+Oct-16 12:08:52.603 [main] DEBUG nextflow.config.ConfigBuilder - User config file: /home/eleanor124/projects/bjorn_rep/nf.config
+Oct-16 12:08:52.605 [main] DEBUG nextflow.config.ConfigBuilder - Parsing config file: /home/eleanor124/projects/bjorn_rep/nf.config
+Oct-16 12:08:52.635 [main] DEBUG n.secret.LocalSecretsProvider - Secrets store: /home/eleanor124/.nextflow/secrets/store.json
+Oct-16 12:08:52.639 [main] DEBUG nextflow.secret.SecretsLoader - Discovered secrets providers: [nextflow.secret.LocalSecretsProvider@6eafb10e] - activable => nextflow.secret.LocalSecretsProvider@6eafb10e
+Oct-16 12:08:52.651 [main] DEBUG nextflow.config.ConfigBuilder - Applying config profile: `standard`
+Oct-16 12:08:53.135 [main] DEBUG nextflow.cli.CmdRun - Applied DSL=2 from script declaration
+Oct-16 12:08:53.149 [main] DEBUG nextflow.cli.CmdRun - Launching `main.nf` [compassionate_mandelbrot] DSL2 - revision: 6a448a22d6
+Oct-16 12:08:53.150 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins default=[]
+Oct-16 12:08:53.151 [main] DEBUG nextflow.plugin.PluginsFacade - Plugins resolved requirement=[]
+Oct-16 12:08:53.194 [main] DEBUG nextflow.Session - Session UUID: b62f8344-b2e5-40c6-841c-56ae8b8d851a
+Oct-16 12:08:53.195 [main] DEBUG nextflow.Session - Run name: compassionate_mandelbrot
+Oct-16 12:08:53.195 [main] DEBUG nextflow.Session - Executor pool size: 22
+Oct-16 12:08:53.202 [main] DEBUG nextflow.file.FilePorter - File porter settings maxRetries=3; maxTransfers=50; pollTimeout=null
+Oct-16 12:08:53.207 [main] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'FileTransfer' minSize=10; maxSize=66; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-16 12:08:53.228 [main] DEBUG nextflow.cli.CmdRun - 
   Version: 25.04.7 build 5955
   Created: 08-09-2025 13:29 UTC (06:29 PDT)
   System: Linux 5.15.153.1-microsoft-standard-WSL2
   Runtime: Groovy 4.0.26 on OpenJDK 64-Bit Server VM 17.0.16+8-Ubuntu-0ubuntu124.04.1
   Encoding: UTF-8 (UTF-8)
-  Process: 99990@Eleanor [127.0.1.1]
-  CPUs: 22 - Mem: 15.3 GB (11 GB) - Swap: 4 GB (4 GB)
-Oct-13 14:02:40.453 [main] DEBUG nextflow.Session - Work-dir: /home/eleanor124/projects/bjorn_rep/work [ext2/ext3]
-Oct-13 14:02:40.487 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
-Oct-13 14:02:40.502 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
-Oct-13 14:02:40.509 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
-Oct-13 14:02:40.537 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
-Oct-13 14:02:40.548 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 23; maxThreads: 1000
-Oct-13 14:02:40.610 [main] DEBUG nextflow.Session - Session start
-Oct-13 14:02:40.852 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
-Oct-13 14:02:41.413 [main] INFO  nextflow.Nextflow - Start consensus genome alignment..
-Oct-13 14:02:41.527 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct-13 14:02:41.528 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct-13 14:02:41.535 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
-Oct-13 14:02:41.544 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=22; memory=15.3 GB; capacity=22; pollInterval=100ms; dumpInterval=5m
-Oct-13 14:02:41.548 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
-Oct-13 14:02:41.574 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:SAMPLING': maxForks=0; fair=false; array=0
-Oct-13 14:02:41.620 [main] INFO  nextflow.Nextflow - Extracting mutations...
-Oct-13 14:02:41.671 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct-13 14:02:41.672 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct-13 14:02:41.674 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP': maxForks=0; fair=false; array=0
-Oct-13 14:02:41.683 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct-13 14:02:41.683 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct-13 14:02:41.684 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT': maxForks=0; fair=false; array=0
-Oct-13 14:02:41.700 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct-13 14:02:41.701 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct-13 14:02:41.703 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION': maxForks=0; fair=false; array=0
-Oct-13 14:02:41.720 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct-13 14:02:41.721 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct-13 14:02:41.722 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP': maxForks=0; fair=false; array=0
-Oct-13 14:02:41.729 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct-13 14:02:41.729 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct-13 14:02:41.729 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT': maxForks=0; fair=false; array=0
-Oct-13 14:02:41.740 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
-Oct-13 14:02:41.740 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
-Oct-13 14:02:41.741 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS': maxForks=0; fair=false; array=0
-Oct-13 14:02:41.746 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: SAMPLING, SRATOOLS_PREFETCH, EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION, EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP, EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT, EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS, TRANSLATE_MUTATIONS, EXTRACT_MUTATIONS:SAMPLING, EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT, CALL_MUTATION, MINIMAP, MAFFT, GOFASTA_CONVERT, GOFASTA_VARIANTS, EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP, GOFASTA_ALIGNMENT
-Oct-13 14:02:41.748 [main] DEBUG nextflow.Session - Igniting dataflow network (10)
-Oct-13 14:02:41.748 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:SAMPLING
-Oct-13 14:02:41.749 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP
-Oct-13 14:02:41.750 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT
-Oct-13 14:02:41.750 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION
-Oct-13 14:02:41.751 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP
-Oct-13 14:02:41.751 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT
-Oct-13 14:02:41.752 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS
-Oct-13 14:02:41.753 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
-  Script_3cc20208463d69b3: /home/eleanor124/projects/bjorn_rep/modules/sampling/main.nf
+  Process: 50343@Eleanor [127.0.1.1]
+  CPUs: 22 - Mem: 15.3 GB (10 GB) - Swap: 4 GB (4 GB)
+Oct-16 12:08:53.244 [main] DEBUG nextflow.Session - Work-dir: /home/eleanor124/projects/bjorn_rep/work [ext2/ext3]
+Oct-16 12:08:53.268 [main] DEBUG nextflow.executor.ExecutorFactory - Extension executors providers=[]
+Oct-16 12:08:53.279 [main] DEBUG nextflow.Session - Observer factory: DefaultObserverFactory
+Oct-16 12:08:53.290 [main] DEBUG nextflow.Session - Observer factory (v2): LinObserverFactory
+Oct-16 12:08:53.311 [main] DEBUG nextflow.cache.CacheFactory - Using Nextflow cache factory: nextflow.cache.DefaultCacheFactory
+Oct-16 12:08:53.318 [main] DEBUG nextflow.util.CustomThreadPool - Creating default thread pool > poolSize: 23; maxThreads: 1000
+Oct-16 12:08:53.362 [main] DEBUG nextflow.Session - Session start
+Oct-16 12:08:53.629 [main] DEBUG nextflow.script.ScriptRunner - > Launching execution
+Oct-16 12:08:54.319 [main] INFO  nextflow.Nextflow - Start consensus genome alignment..
+Oct-16 12:08:54.434 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-16 12:08:54.434 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 12:08:54.439 [main] DEBUG nextflow.executor.Executor - [warm up] executor > local
+Oct-16 12:08:54.445 [main] DEBUG n.processor.LocalPollingMonitor - Creating local task monitor for executor 'local' > cpus=22; memory=15.3 GB; capacity=22; pollInterval=100ms; dumpInterval=5m
+Oct-16 12:08:54.447 [main] DEBUG n.processor.TaskPollingMonitor - >>> barrier register (monitor: local)
+Oct-16 12:08:54.476 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:SAMPLING': maxForks=0; fair=false; array=0
+Oct-16 12:08:54.507 [main] INFO  nextflow.Nextflow - Extracting mutations...
+Oct-16 12:08:54.555 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-16 12:08:54.555 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 12:08:54.556 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP': maxForks=0; fair=false; array=0
+Oct-16 12:08:54.563 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-16 12:08:54.564 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 12:08:54.564 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT': maxForks=0; fair=false; array=0
+Oct-16 12:08:54.578 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-16 12:08:54.578 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 12:08:54.579 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION': maxForks=0; fair=false; array=0
+Oct-16 12:08:54.591 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-16 12:08:54.591 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 12:08:54.593 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP': maxForks=0; fair=false; array=0
+Oct-16 12:08:54.599 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-16 12:08:54.599 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 12:08:54.600 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT': maxForks=0; fair=false; array=0
+Oct-16 12:08:54.613 [main] DEBUG nextflow.executor.ExecutorFactory - << taskConfig executor: null
+Oct-16 12:08:54.613 [main] DEBUG nextflow.executor.ExecutorFactory - >> processorType: 'local'
+Oct-16 12:08:54.614 [main] DEBUG nextflow.processor.TaskProcessor - Creating process 'EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS': maxForks=0; fair=false; array=0
+Oct-16 12:08:54.619 [main] DEBUG nextflow.Session - Workflow process names [dsl2]: SAMPLING, SRATOOLS_PREFETCH, EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION, EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP, EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT, EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS, TRANSLATE_MUTATIONS, EXTRACT_MUTATIONS:SAMPLING, EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT, GET_ALL_FASTA, CALL_MUTATION, MINIMAP, MAFFT, GOFASTA_CONVERT, GOFASTA_VARIANTS, EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP, GOFASTA_ALIGNMENT
+Oct-16 12:08:54.622 [main] DEBUG nextflow.Session - Igniting dataflow network (10)
+Oct-16 12:08:54.622 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:SAMPLING
+Oct-16 12:08:54.623 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP
+Oct-16 12:08:54.623 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT
+Oct-16 12:08:54.624 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION
+Oct-16 12:08:54.624 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP
+Oct-16 12:08:54.625 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT
+Oct-16 12:08:54.625 [main] DEBUG nextflow.processor.TaskProcessor - Starting process > EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS
+Oct-16 12:08:54.626 [main] DEBUG nextflow.script.ScriptRunner - Parsed script files:
+  Script_522b7704a10e762e: /home/eleanor124/projects/bjorn_rep/modules/alignment/main.nf
+  Script_5e11063d60148708: /home/eleanor124/projects/bjorn_rep/workflow/query_genomes.nf
   Script_d5f4a1e98a3e6c1b: /home/eleanor124/projects/bjorn_rep/modules/mutation_calling/main.nf
-  Script_30e945b80685684b: /home/eleanor124/projects/bjorn_rep/modules/alignment/main.nf
-  Script_6adb7d20d54ee53d: /home/eleanor124/projects/bjorn_rep/main.nf
+  Script_50c5b973e596acd0: /home/eleanor124/projects/bjorn_rep/main.nf
   Script_48fcb54b016ad5bf: /home/eleanor124/projects/bjorn_rep/modules/nf-core/prefetch/main.nf
+  Script_a0585695afc7152e: /home/eleanor124/projects/bjorn_rep/modules/extract_data/main.nf
   Script_0bab25b9f4f77694: /home/eleanor124/projects/bjorn_rep/modules/mutation_translation/main.nf
-  Script_d6f7dbaabe7d6251: /home/eleanor124/projects/bjorn_rep/workflow/mutations_analysis.nf
   Script_feeb22a1a48ba201: /home/eleanor124/projects/bjorn_rep/workflow/intrahost_variants.nf
-  Script_d85c74d903eeb57f: /home/eleanor124/projects/bjorn_rep/workflow/main.nf
-  Script_760c36fa7cbf6072: /home/eleanor124/projects/bjorn_rep/workflow/query_genomes.nf
-Oct-13 14:02:41.753 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
-Oct-13 14:02:41.753 [main] DEBUG nextflow.Session - Session await
-Oct-13 14:02:41.791 [Actor Thread 17] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `l` -- Initialise it to a default value eg. `params.l = some_value`
-Oct-13 14:02:41.815 [Actor Thread 17] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `lineage_file` -- Initialise it to a default value eg. `params.lineage_file = some_value`
-Oct-13 14:02:41.896 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:41.899 [Task submitter] INFO  nextflow.Session - [5c/87c50a] Submitted process > EXTRACT_MUTATIONS:SAMPLING
-Oct-13 14:02:41.914 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:41.915 [Task submitter] INFO  nextflow.Session - [cb/df6177] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP
-Oct-13 14:02:41.952 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/cb/df61779879065dee07ce6db60931ca]
-Oct-13 14:02:41.954 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=66; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
-Oct-13 14:02:42.021 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:42.022 [Task submitter] INFO  nextflow.Session - [cb/af374e] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT
-Oct-13 14:02:42.131 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/cb/af374e35b67cbfb7ab7e05ce7360aa]
-Oct-13 14:02:42.860 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: EXTRACT_MUTATIONS:SAMPLING; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/5c/87c50a3a039afccecf329d9cf35d08]
-Oct-13 14:02:43.297 [Actor Thread 22] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 100; slices: 1; internal sort time: 0.203 s; external sort time: 0.007 s; total time: 0.21 s
-Oct-13 14:02:43.324 [Actor Thread 22] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /home/eleanor124/projects/bjorn_rep/work/collect-file/8b1d9a105929bf9ca7eade6c0cde0ece
-Oct-13 14:02:43.329 [Actor Thread 22] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /tmp/nxf-879347348719336110
-Oct-13 14:02:43.335 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:43.336 [Task submitter] INFO  nextflow.Session - [93/74ce39] Submitted process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP (1)
-Oct-13 14:02:43.547 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/93/74ce390e5ebb0b39dd1729818d9f94]
-Oct-13 14:02:43.556 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:43.557 [Task submitter] INFO  nextflow.Session - [c6/a077aa] Submitted process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT (1)
-Oct-13 14:02:43.604 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/c6/a077aa27c691011b7d0e90e7c12c2a]
-Oct-13 14:02:43.629 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:43.630 [Task submitter] INFO  nextflow.Session - [e5/5dca36] Submitted process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION
-Oct-13 14:02:44.391 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 6; name: EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/e5/5dca3686d29fd13a91f3aa25ad2be7]
-Oct-13 14:02:44.414 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:44.415 [Task submitter] INFO  nextflow.Session - [19/d404b4] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (1)
-Oct-13 14:02:44.418 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
-Oct-13 14:02:44.419 [Task submitter] INFO  nextflow.Session - [6e/31f7b5] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2)
-Oct-13 14:02:44.876 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 8; name: EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2); status: COMPLETED; exit: 1; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/6e/31f7b5359378296183c768f97001a9]
-Oct-13 14:02:44.880 [TaskFinalizer-7] DEBUG nextflow.processor.TaskProcessor - Handling unexpected condition for
-  task: name=EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2); work-dir=/home/eleanor124/projects/bjorn_rep/work/6e/31f7b5359378296183c768f97001a9
-  error [nextflow.exception.ProcessFailedException]: Process `EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2)` terminated with an error exit status (1)
-Oct-13 14:02:44.909 [TaskFinalizer-7] ERROR nextflow.processor.TaskProcessor - Error executing process > 'EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2)'
-
-Caused by:
-  Process `EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2)` terminated with an error exit status (1)
-
-
-Command executed:
-
-  translate_mutations.py         -a alignment.fasta         -m mutations.tsv         --gff /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.gff         --query NC_045512.2_BA.1         --bg NC_045512.2         -o mutations.tsv 
-  
-  cp -p NC_045512.2_BA.1_mutations.tsv /home/eleanor124/projects/bjorn_rep/output/NC_045512.2_BA.1_mutations.tsv
-
-Command exit status:
-  1
-
-Command output:
-  │ …   ┆ …   ┆ …   ┆ …   ┆ …   ┆ …   ┆ …   ┆ …   ┆ …   ┆ …   ┆ …   ┆ …      ┆ …     ┆ …     ┆ …     │
-  │ hCo ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ V-1 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 9/U ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SA/ ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ CA- ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SEA ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ RCH ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ -65 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 685 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ /20 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ …   ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ hCo ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ V-1 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 9/U ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SA/ ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SEA ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ RCH ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ -13 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 609 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ /20 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 21  ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ hCo ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ V-1 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 9/M ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ exi ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ co/ ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SEA ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ RCH ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ -10 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 077 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 6/2 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ …   ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ hCo ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ V-1 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 9/U ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SA/ ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ CA- ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SEA ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ RCH ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ -32 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 540 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ /20 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ …   ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ NC_ ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ 045 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 512 ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ .2  ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │     ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  └─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴────────┴───────┴───────┴───────┘
-
-Command error:
-  │ -65 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 685 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ /20 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ …   ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ hCo ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ V-1 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 9/U ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SA/ ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SEA ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ RCH ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ -13 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 609 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ /20 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 21  ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ hCo ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ V-1 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 9/M ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ exi ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ co/ ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SEA ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ RCH ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ -10 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 077 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 6/2 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ …   ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ hCo ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ V-1 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 9/U ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SA/ ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ CA- ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ SEA ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ RCH ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ -32 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ 540 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ /20 ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ …   ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ NC_ ┆ NC_ ┆ 230 ┆ C   ┆ T   ┆ 1   ┆ YP_ ┆ nul ┆ nul ┆ nul ┆ nul ┆ null   ┆ 23075 ┆ T     ┆ C     │
-  │ 045 ┆ 045 ┆ 75  ┆     ┆     ┆     ┆ 009 ┆ l   ┆ l   ┆ l   ┆ l   ┆        ┆       ┆       ┆       │
-  │ 512 ┆ 512 ┆     ┆     ┆     ┆     ┆ 724 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │ .2  ┆ .2  ┆     ┆     ┆     ┆     ┆ 390 ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  │     ┆     ┆     ┆     ┆     ┆     ┆ .1  ┆     ┆     ┆     ┆     ┆        ┆       ┆       ┆       │
-  └─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┴────────┴───────┴───────┴───────┘
-  Traceback (most recent call last):
-    File "/home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py", line 178, in <module>
-      main()
-    File "/home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py", line 174, in main
-      translate_mutations(args)
-    File "/home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py", line 58, in translate_mutations
-      assert (
-  AssertionError: Mismatch between ref nucs for SNPs!
-
-Work dir:
-  /home/eleanor124/projects/bjorn_rep/work/6e/31f7b5359378296183c768f97001a9
-
-Tip: you can try to figure out what's wrong by changing to the process work dir and showing the script file named `.command.sh`
-Oct-13 14:02:44.921 [TaskFinalizer-7] DEBUG nextflow.Session - Session aborted -- Cause: Process `EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2)` terminated with an error exit status (1)
-Oct-13 14:02:44.951 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
-Oct-13 14:02:44.951 [main] DEBUG nextflow.Session - Session await > all processes finished
-Oct-13 14:02:44.951 [main] DEBUG nextflow.Session - Session await > all barriers passed
-Oct-13 14:02:44.958 [main] WARN  n.processor.TaskPollingMonitor - Killing running tasks (1)
-Oct-13 14:02:44.965 [main] DEBUG n.executor.local.LocalTaskHandler - Unable to kill EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (1) -- command: kill -TERM 743; exit: 1 
- bash: line 1: kill: (743) - No such process
-
-Oct-13 14:02:44.969 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=6; failedCount=1; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=1; succeedDuration=1.9s; failedDuration=382ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=2; peakCpus=2; peakMemory=0; ]
-Oct-13 14:02:45.132 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
-Oct-13 14:02:45.142 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye
+  Script_787a2053de1976cd: /home/eleanor124/projects/bjorn_rep/workflow/main.nf
+  Script_42d06fc2c5afba90: /home/eleanor124/projects/bjorn_rep/workflow/mutations_analysis.nf
+Oct-16 12:08:54.626 [main] DEBUG nextflow.script.ScriptRunner - > Awaiting termination 
+Oct-16 12:08:54.626 [main] DEBUG nextflow.Session - Session await
+Oct-16 12:08:54.665 [Actor Thread 16] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `l` -- Initialise it to a default value eg. `params.l = some_value`
+Oct-16 12:08:54.680 [Actor Thread 16] WARN  nextflow.script.ScriptBinding - Access to undefined parameter `lineage_file` -- Initialise it to a default value eg. `params.lineage_file = some_value`
+Oct-16 12:08:54.740 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:08:54.743 [Task submitter] INFO  nextflow.Session - [4f/f27ac5] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP
+Oct-16 12:08:54.758 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:08:54.759 [Task submitter] INFO  nextflow.Session - [2a/82e7ed] Submitted process > EXTRACT_MUTATIONS:SAMPLING
+Oct-16 12:08:54.799 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 1; name: EXTRACT_MUTATIONS:QUERY_GENOMES:MINIMAP; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/4f/f27ac5e879eec41da7c4170be2e10c]
+Oct-16 12:08:54.800 [Task monitor] DEBUG nextflow.util.ThreadPoolBuilder - Creating thread pool 'TaskFinalizer' minSize=10; maxSize=66; workQueue=LinkedBlockingQueue[-1]; allowCoreThreadTimeout=false
+Oct-16 12:08:54.858 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:08:54.868 [Task submitter] INFO  nextflow.Session - [8e/2569f1] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT
+Oct-16 12:08:54.971 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 3; name: EXTRACT_MUTATIONS:QUERY_GENOMES:GOFASTA_ALIGNMENT; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/8e/2569f160fb161a1a1912ee065020e7]
+Oct-16 12:08:55.385 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 2; name: EXTRACT_MUTATIONS:SAMPLING; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/2a/82e7edcd9ade3fd76911e48dd87b8e]
+Oct-16 12:08:55.787 [Actor Thread 23] DEBUG nextflow.sort.BigSort - Sort completed -- entries: 100; slices: 1; internal sort time: 0.218 s; external sort time: 0.009 s; total time: 0.227 s
+Oct-16 12:08:55.813 [Actor Thread 23] DEBUG nextflow.file.FileCollector - Saved collect-files list to: /home/eleanor124/projects/bjorn_rep/work/collect-file/9fe37eb168b0f83e213c8dfbc27b7ac1
+Oct-16 12:08:55.819 [Actor Thread 23] DEBUG nextflow.file.FileCollector - Deleting file collector temp dir: /tmp/nxf-5801032956967300686
+Oct-16 12:08:55.825 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:08:55.825 [Task submitter] INFO  nextflow.Session - [a9/50cd13] Submitted process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP (1)
+Oct-16 12:08:56.042 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 4; name: EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:MINIMAP (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/a9/50cd132bbcd7fd106b5a9452fd85cb]
+Oct-16 12:08:56.053 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:08:56.053 [Task submitter] INFO  nextflow.Session - [bf/4e54c3] Submitted process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT (1)
+Oct-16 12:08:56.127 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 5; name: EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:GOFASTA_ALIGNMENT (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/bf/4e54c3958d563e249b22223279a135]
+Oct-16 12:08:56.151 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:08:56.151 [Task submitter] INFO  nextflow.Session - [ff/b1ede3] Submitted process > EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION
+Oct-16 12:09:02.569 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 6; name: EXTRACT_MUTATIONS:MUTATIONS_ANALYSIS_WORKFLOW:CALL_MUTATION; status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/ff/b1ede3ee8b4a8a2db74ad784578b13]
+Oct-16 12:09:02.590 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:09:02.590 [Task submitter] INFO  nextflow.Session - [23/aaaa87] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2)
+Oct-16 12:09:02.593 [Task submitter] DEBUG n.executor.local.LocalTaskHandler - Launch cmd line: /bin/bash -ue .command.run
+Oct-16 12:09:02.594 [Task submitter] INFO  nextflow.Session - [48/8e0017] Submitted process > EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (1)
+Oct-16 12:09:03.051 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 8; name: EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (2); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/23/aaaa8764e1f663944dd13d0e9e1625]
+Oct-16 12:09:03.085 [Task monitor] DEBUG n.processor.TaskPollingMonitor - Task completed > TaskHandler[id: 7; name: EXTRACT_MUTATIONS:QUERY_GENOMES:TRANSLATE_MUTATIONS (1); status: COMPLETED; exit: 0; error: -; workDir: /home/eleanor124/projects/bjorn_rep/work/48/8e0017ad70f777f1d4f9664856ab66]
+Oct-16 12:09:03.087 [main] DEBUG nextflow.Session - Session await > all processes finished
+Oct-16 12:09:03.186 [Task monitor] DEBUG n.processor.TaskPollingMonitor - <<< barrier arrives (monitor: local) - terminating tasks monitor poll loop
+Oct-16 12:09:03.186 [main] DEBUG nextflow.Session - Session await > all barriers passed
+Oct-16 12:09:03.189 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'TaskFinalizer' shutdown completed (hard=false)
+Oct-16 12:09:03.202 [main] DEBUG n.trace.WorkflowStatsObserver - Workflow completed > WorkflowStats[succeededCount=8; failedCount=0; ignoredCount=0; cachedCount=0; pendingCount=0; submittedCount=0; runningCount=0; retriesCount=0; abortedCount=0; succeedDuration=8.2s; failedDuration=0ms; cachedDuration=0ms;loadCpus=0; loadMemory=0; peakRunning=2; peakCpus=2; peakMemory=0; ]
+Oct-16 12:09:03.202 [main] DEBUG nextflow.trace.TimelineObserver - Workflow completed -- rendering execution timeline
+Oct-16 12:09:03.423 [main] DEBUG nextflow.cache.CacheDB - Closing CacheDB done
+Oct-16 12:09:03.435 [main] DEBUG nextflow.util.ThreadPoolManager - Thread pool 'FileTransfer' shutdown completed (hard=false)
+Oct-16 12:09:03.436 [main] DEBUG nextflow.script.ScriptRunner - > Execution complete -- Goodbye

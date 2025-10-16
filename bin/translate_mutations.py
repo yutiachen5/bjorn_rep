@@ -54,9 +54,8 @@ def translate_mutations(args):
 
     merged = mutation.join(references, on="pos", how="full") # left: mutation, right: references
 
-    print(merged.filter(both & (pl.col("bg.ref") != pl.col("ref"))))
     assert (
-        merged.filter(both & pl.col("alt").str.len_chars() == 1)
+        merged.filter(both)
             .select((pl.col("bg.ref") == pl.col("ref")).all())
             .item()
     ), "Mismatch between ref nucs for SNPs!"

@@ -13,9 +13,6 @@ def validateParameters() {
     if (!params.fasta_dir) {
         exit 1, "Input FASTA directory not specified!"
     }
-    // if (!params.metadata) {
-    //     exit 1, "Metadata not specified!"
-    // }
     if (params.translate_mutations && !params.query) {
         exit 1, "Query genome not specified!"
     }

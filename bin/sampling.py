@@ -5,6 +5,7 @@ import pandas as pd
 import random
 import argparse
 
+random.seed(42)
 
 def sampling(args):
     # select samples from certain lineage
@@ -14,7 +15,7 @@ def sampling(args):
         df["prefix"] = df["prefix"].fillna(df["lineage"])
         selected_fasta = list(df.loc[df["prefix"] == args.l, :]["taxon"])
 
-        with open("selected_fasta.txt", "w") as out:
+        with open("fasta_files.txt", "w") as out:
             for f in selected_fasta:
                 if os.path.isfile(os.path.join(args.fasta_dir, f+".fasta")):
                     path = os.path.join(args.fasta_dir, f+".fasta") 
@@ -25,7 +26,7 @@ def sampling(args):
                         for f in os.listdir(args.fasta_dir) if os.path.isfile(os.path.join(args.fasta_dir, f))]
         selected_fasta = random.sample(all_samples, min(args.n, len(all_samples)))
 
-        with open("selected_fasta.txt", "w") as out:
+        with open("fasta_files.txt", "w") as out:
             for f in selected_fasta:
                 out.write(f + "\n")
     

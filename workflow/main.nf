@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
-include { SAMPLING } from '../modules/sampling/main.nf'
+include { SAMPLING } from '../modules/extract_data/main.nf'
+include { GET_ALL_FASTA } from '../modules/extract_data/main.nf'
 include { MUTATIONS_ANALYSIS_WORKFLOW } from './mutations_analysis.nf'
 include { INTRAHOST_VARIANTS_WORKFLOW } from './intrahost_variants.nf' 
 include { QUERY_GENOMES } from './query_genomes.nf'
@@ -11,10 +12,14 @@ workflow EXTRACT_MUTATIONS {
     metadata_ch
 
     main:
-        selected_fasta = SAMPLING(params.fasta_dir).selected_fasta
-
+        if (params.sampling) {
+            fasta_files = SAMPLING(params.fasta_dir).selected_fasta
+        } else {
+            fasta_files = GET_ALL_FASTA(params.fasta_dir).all_fasta
+        }
+        
         log.info "Extracting mutations..."
-        fasta_ch = selected_fasta
+        fasta_ch = fasta_files
                     .splitText()
                     .map{ filename -> 
                         def trimed_filename = filename.trim()

@@ -5,3 +5,4 @@
 /output/BA
 *.txt
 *.log
+.nextflow.log*

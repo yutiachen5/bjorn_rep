@@ -12,11 +12,12 @@ process SAMPLING {
         """
         sampling.py --fasta_dir ${params.fasta_dir} \
                     -l ${params.l} \
-                    --lineage_file ${params.lineage_file}
+                    --lineage_file ${params.lineage_file} \
         """
     } else {
         """
-        sampling.py --fasta_dir ${params.fasta_dir} -n 100
+        sampling.py --fasta_dir ${params.fasta_dir} \
+                    -n 100 \
         """
     }
 }
@@ -32,4 +33,5 @@ process GET_ALL_FASTA {
     """
     find ${fasta_dir} -type f \\( -name "*.fasta" -o -name "*.fa" \\) -exec realpath {} \\; > fasta_files.txt
     """
+
 }

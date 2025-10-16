@@ -53,25 +53,41 @@ def mutation_calling(args):
             while i < length:
                 if ref_seq[i] != alt_seq[i]:
                     gff_feature = get_gff_feature(i+1, gff)
-                    if alt_seq[i] == "-": # del
+
+                    # DEL
+                    if alt_seq[i] == "-": 
                         j = i
                         while j + 1 < length and alt_seq[j+1] == "-":
                             j += 1
                         deleted = ref_seq[i:j+1]
-                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t-{deleted}\t{gff_feature}\t{len(deleted)}\n")
 
+                        # Skip leading or trailing deletions
+                        if i == 0 or j == length - 1:
+                            i = j + 1
+                            continue
+
+                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t-{deleted}\t{gff_feature}\t{len(deleted)}\n")
                         i = j+1
                         continue
-                    elif ref_seq[i] == "-": # ins
+
+                    # INS
+                    elif ref_seq[i] == "-": 
                         j = i
                         while j + 1 < length and ref_seq[j+1] == "-":
                             j += 1
                         inserted = alt_seq[i:j+1]
-                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t{gff_feature}\t{len(inserted)}\n")
 
+                        # Skip leading or trailing insertions
+                        if i == 0 or j == length - 1:
+                            i = j + 1
+                            continue
+
+                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t{gff_feature}\t{len(inserted)}\n")
                         i = j+1
                         continue
-                    else: # snp
+
+                    # SNP
+                    else: 
                         outfile.write(f"{record.id}\t{args.region}\t{int(i+1)}\t{ref_seq[i]}\t{alt_seq[i]}\t{gff_feature}\t1\n") 
                 i += 1
     

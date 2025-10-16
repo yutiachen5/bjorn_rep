@@ -1,8 +1,5 @@
-// alignment using minimap2
-
 process MINIMAP {
     input:
-    path ref_genome
     path query_seq
 
     output:
@@ -10,12 +7,13 @@ process MINIMAP {
 
     script:
     """
+    cat ${params.ref_file} ${query_seq} > query.fasta
     minimap2 -a \\
              -x asm20 \\
              --score-N=0 \\
              -N 0 \\
              -p 0.8 \\
-             ${ref_genome} ${query_seq} > alignment.sam
+             ${params.ref_file} query.fasta > alignment.sam
     """
 }
 
@@ -40,7 +38,6 @@ process MAFFT {
 process GOFASTA_ALIGNMENT {
     input:
     path alignment_sam
-    path ref_genome
     
     output:
     path "alignment.fasta", emit: alignment_fasta
@@ -48,11 +45,7 @@ process GOFASTA_ALIGNMENT {
     script:
     """
     gofasta sam toMultiAlign -s ${alignment_sam} \\
-                             -o alignment_samples.fasta
-
-    cat ${ref_genome} alignment_samples.fasta > alignment_ref_samples.fasta 
-
-    seqkit seq -w 0 alignment_ref_samples.fasta > alignment.fasta                      
+                             -o alignment.fasta                
     """
 }
 

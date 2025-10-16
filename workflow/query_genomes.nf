@@ -11,15 +11,13 @@ workflow QUERY_GENOMES {
         query_id_ch
 
     main:
-        // alignment file which contains query and background genomes
-        // mafft_ch = MAFFT(params.ref_file, params.query).mafft_fasta .collect()
+        // mafft_ch = MAFFT(params.ref_file, params.query).mafft_fasta.collect()
 
-        alignment_sam = MINIMAP(params.ref_file, params.query).alignment_sam
-        alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam, params.ref_file).alignment_fasta.collect()
+        alignment_sam = MINIMAP(params.query).alignment_sam
+        alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta.collect()
 
         TRANSLATE_MUTATIONS(alignment_fasta, mutation_ch.collect(), query_id_ch)
 
     // emit:
-
 
 }

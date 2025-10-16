@@ -1,5 +1,5 @@
-// variant calling using go_fasta, sam --> csv 
-process GOFASTA_VARIANTS {
+// mutation calling using go_fasta, sam --> csv 
+process GOFASTA_SAM_VARIANTS {
     input:
     path alignment_sam
 
@@ -12,12 +12,28 @@ process GOFASTA_VARIANTS {
                          -a ${params.gff_file} \\
                          --append-snps \\
                          -o aa_changes.csv
-
-    cp -p aa_changes.csv ${params.outdir}/aa_changes.csv
     """
 }
 
-// file format conversion. csv --> tsv
+// mutation calling using go_fasta, fasta --> csv 
+process GOFASTA_VARIANTS {
+    input:
+    path alignment_fasta
+
+    output:
+    path "aa_changes.csv", emit: aa_changes_csv
+
+    script:
+    """
+    gofasta variants --msa ${alignment_fasta} \\
+                     --reference ${params.ref_id} \\
+                     -a ${params.gff_file} \\
+                     --append-snps \\
+                     -o aa_changes.csv
+    """
+}
+
+// file format conversion, csv --> tsv
 process GOFASTA_CONVERT {
     input:
     path aa_changes_csv

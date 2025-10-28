@@ -114,3 +114,132 @@ if __name__ == "__main__":
 
 # for testing locally:
 # python /home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py -m /home/eleanor124/projects/bjorn_rep/output/mutations.tsv -a /home/eleanor124/projects/bjorn_rep/mafft_oneline.fasta --query 'NC_045512.2_BA.1' --bg 'NC_045512.2'
+
+
+
+def translate_mutations(args):
+    references, length = extract_ref_variants(args)
+    tmp = references.filter(pl.col("pos") == 22555)
+    print(tmp)
+
+    mutation = pl.read_csv(args.m, separator="\t", has_header=True)
+    tmp = mutation.filter((pl.col("pos") == 22555) & (pl.col("sra") == 'hCoV-19/Iraq/KR-SEARCH-118872/2021'))
+    print(tmp)
+
+    sample_id = mutation.select(pl.col("sra").unique())
+    gff = parse_gff(args.gff)
+    
+
+    both = (pl.col("sra").is_not_null()) & (pl.col("bg.ref").is_not_null())
+    left_only = (pl.col("sra").is_not_null()) & (pl.col("bg.ref").is_null())
+    right_only = (pl.col("sra").is_null()) & (pl.col("bg.ref").is_not_null())
+
+    merged = mutation.join(references, on="pos", how="full") # left: mutation, right: references
+
+    assert (
+        merged.filter(both)
+            .select((pl.col("bg.ref") == pl.col("ref")).all())
+            .item()
+    ), "Mismatch between ref nucs for SNPs!"
+    assert (merged.select((pl.col("ref") != pl.col("alt")).all()).item()), "ref shouldn't match alt in mutation file!"
+
+    merged = merged.rename({"ref": "old_ref", "alt": "old_alt"})   
+                
+    # case1: both & old_alt == q.ref, rm
+    # case2: both & old_alt != q.ref
+    # case3: mut on new ref only (old_alt == bg.ref != q.ref), add: ref = q.ref, alt = bg.ref 
+    # case4: mut on old ref only (bg.ref == q.ref), keep: ref = old_ref, alt = old_alt
+
+    merged = (
+        merged.with_columns(
+            # case1
+            pl.when(both & (pl.col("old_alt") == pl.col("q.ref")))
+                .then(None)
+
+            # case2
+            .when(both & (pl.col("old_alt") != pl.col("q.ref")))
+                .then(pl.struct([pl.col("q.ref").alias("ref"),
+                                 pl.col("old_alt").alias("alt")]))
+            # case3
+            .when(right_only)
+                .then(pl.struct([pl.col("q.ref").alias("ref"),
+                                 pl.col("bg.ref").alias("alt")]))
+            # case4
+            .when(left_only)
+                .then(pl.struct([pl.col("old_ref").alias("ref"),
+                                 pl.col("old_alt").alias("alt")]))
+            .otherwise(None)  
+            .alias("case"),
+            pl.coalesce([pl.col("pos"), pl.col("pos_right")]).alias("pos")
+        )
+        .filter(pl.col("case").is_not_null())
+        .drop(["q.ref", "old_ref", "old_alt", "pos_right"])      
+        .unnest("case")          
+        .sort("pos")
+    )
+
+    # remove the sample if its mut pos is inside the region of del
+    deletion = (
+        merged.filter(pl.col("alt").str.starts_with("-"))
+           .with_columns((pl.col("pos") + pl.col("mut_len")).alias("end"))
+           .select(["sra", "pos", "end"])
+           .sort(["sra", "pos"])
+           .rename({"pos": "del_start", "end": "del_end"})
+    )
+
+    right = merged.filter(right_only)
+    left_both = merged.filter(~right_only)
+
+    # get the sample info for the variants coming from new ref genome
+    right = right.join(sample_id, how="cross")
+    right = (
+        right.sort("pos")
+            .join_asof(
+                gff.sort("start"),
+                left_on="pos",
+                right_on="start",
+                strategy="backward" # pos in variants_sample was matched with the closet start position from gff, where pos>start
+            )
+            .with_columns(
+                pl.when(pl.col("pos") <= pl.col("end"))
+                    .then(pl.col("GFF_FEATURE_right"))
+                    .otherwise(pl.col("GFF_FEATURE"))
+                    .alias("GFF_FEATURE")
+            )
+            .with_columns([
+                pl.coalesce([pl.col("sra"), pl.col("sra_right")]).alias("sra"),
+                pl.coalesce([pl.col("region"), pl.col("region_right")]).alias("region")
+            ])
+            .drop(["sra_right", "start", "end", "GFF_FEATURE_right", "region_right"])
+            .sort(["sra", "pos"])
+    )
+
+    # right = (
+    #     right.join_asof(
+    #         deletion.sort(["sra", "del_start"]),
+    #         left_on="pos",
+    #         right_on="del_start",
+    #         by="sra",  # ensure we only match deletions within the same sample
+    #         strategy="backward",
+    #     )
+    #     # keep only those not inside any deletion interval of the same sra
+    #     .filter(
+    #         ~(
+    #             (pl.col("pos") >= pl.col("del_start")) &
+    #             (pl.col("pos") <= pl.col("del_end"))
+    #         )
+    # )
+    # .drop(["del_start", "del_end"])
+    # )
+    # print(right)
+    # raise Exception
+
+    final = (
+        pl.concat([right, left_both])
+                .drop(["bg.ref"]) # todo: drop mut_len in output files??
+                .sort("pos")
+    )
+    print(final.height)
+
+    # final.write_csv("tmp.tsv", separator="\t", include_header=True)
+    # final.write_csv(args.query+"_"+args.o, separator="\t", include_header=True)

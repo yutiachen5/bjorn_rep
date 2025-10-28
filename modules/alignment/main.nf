@@ -7,13 +7,19 @@ process MINIMAP {
 
     script:
     """
+    mkdir -p ${params.outdir}
+
     cat ${params.ref_file} ${query_seq} > query.fasta
+
     minimap2 -a \\
-             -x asm20 \\
+             -x map-ont \\
              --score-N=0 \\
-             -N 0 \\
-             -p 0.8 \\
+             --sam-hit-only \\
+             --secondary=no \\
              ${params.ref_file} query.fasta > alignment.sam
+
+    cp -p query.fasta ${params.outdir}/query.fasta
+    cp -p alignment.sam ${params.outdir}/alignment.sam
     """
 }
 
@@ -44,8 +50,12 @@ process GOFASTA_ALIGNMENT {
 
     script:
     """
+    mkdir -p ${params.outdir}
+
     gofasta sam toMultiAlign -s ${alignment_sam} \\
-                             -o alignment.fasta                
+                             -r ${params.ref_file} \\
+                             -o alignment.fasta 
+    cp -p alignment.fasta ${params.outdir}/alignment.fasta               
     """
 }
 

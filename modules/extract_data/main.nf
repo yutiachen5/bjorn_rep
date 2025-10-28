@@ -17,7 +17,7 @@ process SAMPLING {
     } else {
         """
         sampling.py --fasta_dir ${params.fasta_dir} \
-                    -n 100 \
+                    --nsamples ${params.nsamples} \
         """
     }
 }

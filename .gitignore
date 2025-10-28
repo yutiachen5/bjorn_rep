@@ -1,8 +1,7 @@
 /work
 /.nextflow
-/data/consensus_sequences
-/data/testing
-/output/BA
+/data
+/output
 *.txt
 *.log
 .nextflow.log*

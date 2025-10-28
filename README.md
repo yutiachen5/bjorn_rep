@@ -26,29 +26,50 @@ docker build -t bjorn .
 docker run bjorn
 ```
 
-for all BA samples:
+
+with manual mutation calling
 ```
 nextflow run main.nf \
-   --fasta_dir $PWD/data/consensus_sequences \
-   --ref_file $PWD/data/NC_045512.2.fasta \
-   --gff_file $PWD/data/NC_045512.2.gff \
-   --query $PWD/data/BA.1_and_BA.2.fa \
+   --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
+   --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
+   --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
+   --translate_mutations true \
+   --ref_id NC_045512.2 \
+   --query_id NC_045512.2_BA.1,NC_045512.2_BA.2 \
+   --query_file $PWD/data/Hu1-BA/BA.1_and_BA.2.fa \
    --region NC_045512.2 \
-   --lineage_file $PWD/data/lineage_report.csv \
-   --l BA \
-   -c nf.config 
-
+   --nsamples 1000 \
+   --outdir $PWD/output/Hu1/ \
+   -c nf.config
 ```
 
-100 samples from random selection:
+with gofasta mutation calling (no translation)
 ```
 nextflow run main.nf \
-   --fasta_dir $PWD/data/consensus_sequences \
-   --ref_file $PWD/data/NC_045512.2.fasta \
-   --gff_file $PWD/data/NC_045512.2.gff \
-   --query $PWD/data/BA.1_and_BA.2.fa \
+   --gofasta true \
+   --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
+   --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
+   --ref_id NC_045512.2 \
+   --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
+   --translate_mutations false \
+   --nsamples 1000 \
    --region NC_045512.2 \
-   -c nf.config \
-   -with-timeline /home/eleanor124/projects/bjorn_rep/output/timeline.html
+   --outdir $PWD/output/Hu1/gofasta \
+   -c nf.config
+```
+
+on PB-2 data:
+```
+nextflow run main.nf \
+   --fasta_dir $PWD/data/PB2-DMS/PB2_samples/ \
+   --ref_file $PWD/data/PB2-DMS/PP755596.1.fasta \
+   --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
+   --query_file $PWD/data/PB2-DMS/CY018884.1.fasta \
+   --region PP755596.1 \
+   --outdir $PWD/output/PB2 \
+   --ref_id PP755596.1_cds_XAJ25426.1_1 \
+   --query_id CY018884.1_cds_ABM21959.1_1 \
+   --nsamples 1000 \
+   -c nf.config
 ```
 

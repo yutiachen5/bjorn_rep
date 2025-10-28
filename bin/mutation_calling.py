@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import re
-import csv
 import argparse
 from Bio import SeqIO
 import pandas as pd
@@ -17,19 +16,18 @@ def parse_gff(gff_path):
             cols = line.split("\t")
             if len(cols) != 9:
                 continue
-            if cols[2] == 'CDS': # cds only, ID=id-YP_009724389.1:5325..5925
+            if cols[2] == 'CDS': # cds only
                 start, end = int(cols[3]), int(cols[4])
-                gff_feature = re.search(r"YP_\d+\.\d+", cols[-1]).group() 
+                gff_feature = re.search(r"(?<=cds-)[^;\s]+", cols[-1]).group()
                 gff.append({"start": start, "end": end, "GFF_FEATURE": gff_feature})
 
     return pl.DataFrame(gff)
 
 def get_gff_feature(pos, gff):
     match = gff.filter((pl.col("start") <= pos) & (pos <= pl.col("end")))
-    if match.height > 0:
-        return match[0, "GFF_FEATURE"]
-    else:
-        return ""
+
+    return match["GFF_FEATURE"].to_list() if match.height > 0 else []
+
     
 def mutation_calling(args):
     records = list(SeqIO.parse(args.a, "fasta"))
@@ -44,10 +42,11 @@ def mutation_calling(args):
         header = ["sra", "region", "pos", "ref", "alt", "GFF_FEATURE", "mut_len"]
         outfile.write("\t".join(header) + "\n")
 
+        ref_seq = str(records[0].seq)
+
         for record in records[1:]:
             i = 0
 
-            ref_seq = str(records[0].seq)
             alt_seq = str(record.seq)
 
             while i < length:
@@ -65,8 +64,9 @@ def mutation_calling(args):
                         if i == 0 or j == length - 1:
                             i = j + 1
                             continue
-
-                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t-{deleted}\t{gff_feature}\t{len(deleted)}\n")
+                        
+                        for g in gff_feature or [""]:
+                            outfile.write(f"{record.id}\t{args.region}\t{i}\t{ref_seq[i-1]}\t-{deleted}\t{g}\t{len(deleted)}\n") # use the preceding nuc as ref
                         i = j+1
                         continue
 
@@ -82,13 +82,15 @@ def mutation_calling(args):
                             i = j + 1
                             continue
 
-                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t{gff_feature}\t{len(inserted)}\n")
+                        for g in gff_feature or [""]:
+                            outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t{g}\t{len(inserted)}\n")
                         i = j+1
                         continue
 
                     # SNP
                     else: 
-                        outfile.write(f"{record.id}\t{args.region}\t{int(i+1)}\t{ref_seq[i]}\t{alt_seq[i]}\t{gff_feature}\t1\n") 
+                        for g in gff_feature or [""]:
+                            outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t{alt_seq[i]}\t{g}\t1\n") 
                 i += 1
     
 
@@ -109,7 +111,7 @@ if __name__ == '__main__':
     main()
 
 # python /home/eleanor124/projects/bjorn_rep/bin/mutation_calling.py \
-#   -a /home/eleanor124/projects/bjorn_rep/data/testing/aligned.fasta \
-#   --gff /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.gff \
+#   -a /home/eleanor124/projects/bjorn_rep/output/Hu1/alignment_test.fasta \
+#   --gff /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
 #   --region NC_045512.2 \
 #   -o /home/eleanor124/projects/bjorn_rep/data/testing/mutations.tsv

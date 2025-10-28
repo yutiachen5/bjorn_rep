@@ -2,6 +2,7 @@
 
 import re
 import argparse
+import pandas as pd
 import polars as pl
 from Bio import SeqIO
 
@@ -12,16 +13,22 @@ def extract_ref_variants(args):
 
     seq_len = set([len(record.seq) for record in records])
     assert len(seq_len) == 1, "Sequence length mismatch!"
+    length = seq_len.pop()
 
     ids = [args.bg, args.query]
-    rec_dic = {record.id: record.seq for record in records if record.id in ids}
+    ref_dic = {record.id: record.seq for record in records if record.id in ids}
 
     references = []
-    for i in range(seq_len.pop()): 
-        if rec_dic[args.bg][i] != rec_dic[args.query][i]:
-            references.append({"pos": i+1, "bg.ref":rec_dic[args.bg][i], "q.ref":rec_dic[args.query][i]}) # 1-based index
+    for i in range(length): 
+        if ref_dic[args.bg][i] != ref_dic[args.query][i]:
+            references.append({"pos": i+1, "bg.ref":ref_dic[args.bg][i], "q.ref":ref_dic[args.query][i]}) # 1-based index
 
-    return pl.DataFrame(references)
+    return pl.DataFrame(references), ref_dic
+
+def get_gff_feature(pos, gff):
+    match = gff[(gff["start"] <= pos) & (pos <= gff["end"])]
+
+    return match["GFF_FEATURE"].tolist() if not match.empty else []
 
 def parse_gff(gff_path):
     gff = []
@@ -33,131 +40,70 @@ def parse_gff(gff_path):
             cols = line.split("\t")
             if len(cols) != 9:
                 continue
-            if cols[2] == 'CDS': # cds only, ID=id-YP_009724389.1:5325..5925
+            if cols[2] == 'CDS': # cds only
                 region = cols[0]
                 start, end = int(cols[3]), int(cols[4])
-                gff_feature = re.search(r"YP_\d+\.\d+", cols[-1]).group() 
+                gff_feature = re.search(r"(?<=cds-)[^;\s]+", cols[-1]).group()
                 gff.append({"region":region, "start": start, "end": end, "GFF_FEATURE": gff_feature})
 
-    return pl.DataFrame(gff)
+    return pd.DataFrame(gff)
+
+def match_del(pos, s, deletion):
+    match = deletion[(deletion["start"] <= pos) & (pos <= deletion["end"]) & (deletion["sra"] == s)]
+
+    return True if not match.empty else False
 
 def translate_mutations(args):
-    references = extract_ref_variants(args)
-    mutation = pl.read_csv(args.m, separator="\t", has_header=True)
-    sample_id = mutation.select(pl.col("sra").unique())
+    mutation = pd.read_csv(args.m, sep="\t", header=0)
+    deletion = mutation[mutation["alt"].str.startswith("-")].copy()
+    deletion["end"] = deletion["pos"] + deletion["mut_len"]
+    deletion["start"] = deletion["pos"] + 1
+
+    ref_variants, ref_dic = extract_ref_variants(args) # ref_variants: {"pos": 2, "Hu1": "A", "BA1": "T"}
     gff = parse_gff(args.gff)
-    
 
-    both = (pl.col("sra").is_not_null()) & (pl.col("bg.ref").is_not_null())
-    left_only = (pl.col("sra").is_not_null()) & (pl.col("bg.ref").is_null())
-    right_only = (pl.col("sra").is_null()) & (pl.col("bg.ref").is_not_null())
+    sample_id = mutation["sra"].unique()
+    bg_seq, q_seq = ref_dic[args.bg], ref_dic[args.query]
+    length = len(bg_seq)
 
-    merged = mutation.join(references, on="pos", how="full") # left: mutation, right: references
+    header = ["sra", "region", "pos", "ref", "alt", "GFF_FEATURE", "ref_codon", "alt_codon", "ref_aa", "alt_aa", "pos_aa"]
 
-    assert (
-        merged.filter(both)
-            .select((pl.col("bg.ref") == pl.col("ref")).all())
-            .item()
-    ), "Mismatch between ref nucs for SNPs!"
-    assert (merged.select((pl.col("ref") != pl.col("alt")).all()).item()), "ref shouldn't match alt in mutation file!"
+    # case1: both & old_alt == q.ref, continue
+    # case2: both & old_alt != q.ref, write: ref = q.ref, alt = old_ale
+    # case3: mut on new ref only (old_alt == bg.ref != q.ref), write for all samples: ref = q.ref, alt = bg.ref 
+    # case4: bg.ref == q.ref, write the current mut: ref = old_ref, alt = old_alt
 
-    merged = merged.rename({"ref": "old_ref", "alt": "old_alt"})   
-                
-    # case1: both & old_alt == q.ref, rm
-    # case2: both & old_alt != q.ref
-        # case2a - snp: update: ref = q.ref, alt = old_alt
-        # case2b - ins: update: ref = q.ref, alt = old_alt
-        # case2c - del: ref = q.ref, alt = -q.ref
-    # case3: mut on new ref only (old_alt == bg.ref != q.ref), add: ref = q.ref, alt = bg.ref 
-    # case4: mut on old ref only (bg.ref == q.ref), keep: ref = old_ref, alt = old_alt
+    with open(args.query+"_"+args.o, "w") as outfile:
+        outfile.write("\t".join(header) + "\n")
 
-    merged = (
-        merged.with_columns(
-            # case1
-            pl.when(both & (pl.col("old_alt") == pl.col("q.ref")))
-                .then(None)
+        for i in range(length):
+            if (i+1) not in ref_variants["pos"].to_list(): # case 4: bg.ref == q.ref
+                tmp = mutation[mutation["pos"] == i+1]
+                tmp.to_csv(outfile, sep="\t", header=False, index=False)
+            else:
+                gff_feature = get_gff_feature(i+1, gff) 
 
-            # case2a and 2b - ins and snp
-            .when(both & (pl.col("old_alt") != pl.col("q.ref")) & (pl.col("old_alt").str.starts_with("+") | pl.col("old_alt").str.len_chars() == 1))
-                .then(pl.struct([pl.col("q.ref").alias("ref"),
-                                 pl.col("old_alt").alias("alt")]))
-            # case2c - del
-            .when(both & (pl.col("old_alt").str.starts_with("-")))
-                .then(pl.struct([pl.col("q.ref").alias("ref"),
-                                 ("-" + pl.col("q.ref")).alias("alt")]))
-            # case3
-            .when(right_only)
-                .then(pl.struct([pl.col("q.ref").alias("ref"),
-                                 pl.col("bg.ref").alias("alt")]))
-            # case4
-            .when(left_only)
-                .then(pl.struct([pl.col("old_ref").alias("ref"),
-                                 pl.col("old_alt").alias("alt")]))
-            .otherwise(None)  
-            .alias("case"),
-            pl.coalesce([pl.col("pos"), pl.col("pos_right")]).alias("pos")
-        )
-        .filter(pl.col("case").is_not_null())
-        .drop(["q.ref", "old_ref", "old_alt", "pos_right"])      
-        .unnest("case")          
-        .sort("pos")
-    )
+                tmp = mutation[mutation["pos"] == i+1]
+                tmp_sample = list(tmp["sra"])
 
-    # remove the sample if its mut pos is inside the region of del
-    deletion = (
-        merged.filter(pl.col("alt").str.starts_with("-"))
-           .with_columns((pl.col("pos") + pl.col("mut_len") - 1).alias("end"))
-           .select(["sra", "pos", "end"])
-           .sort(["sra", "pos"])
-    )
+                for s in sample_id:
+                    del_match = match_del(i+1, s, deletion)
+                    if del_match:
+                        continue
+                    if s in tmp_sample: # alt != bg.ref
+                        alt = tmp.loc[tmp["sra"] == s, "alt"].iloc[0]
+                        if alt == q_seq[i]: # case 1: alt != bg.ref & alt == q.ref
+                            continue
+                        else: # case 2: alt != bg.ref & alt != q.ref
+                            for g in gff_feature:
+                                outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], alt, g]) + "\n")
 
-    right = merged.filter(right_only)
-    left_both = merged.filter(~right_only)
+                    else: # case 3: alt == bg.ref
+                        for g in gff_feature:
+                            outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], bg_seq[i], g]) + "\n")
 
-    # get the sample info for the variants coming from new ref genome
-    right = right.join(sample_id, how="cross")
-    right = (
-        right.sort("pos")
-            .join_asof(
-                gff.sort("start"),
-                left_on="pos",
-                right_on="start",
-                strategy="backward" # pos in variants_sample was matched with the closet start position from gff, where pos>start
-            )
-            .with_columns(
-                pl.when(pl.col("pos") <= pl.col("end"))
-                    .then(pl.col("GFF_FEATURE_right"))
-                    .otherwise(pl.col("GFF_FEATURE"))
-                    .alias("GFF_FEATURE")
-            )
-            .with_columns([
-                pl.coalesce([pl.col("sra"), pl.col("sra_right")]).alias("sra"),
-                pl.coalesce([pl.col("region"), pl.col("region_right")]).alias("region")
-            ])
-            .drop(["sra_right", "start", "end", "GFF_FEATURE_right", "region_right"])
-            .sort(["sra", "pos"])
-    )
-
-    right = (
-        right.join_asof(
-            deletion.sort(["sra", "pos"]),
-            left_on="pos",
-            right_on="pos",
-            by="sra", # join per sample
-            strategy="backward",
-        )
-        .filter(~(pl.col("pos") <= pl.col("end")))  # keep only those NOT in deletion
-        .drop(["end"])
-    )
-
-    final = (
-        pl.concat([right, left_both])
-                .drop(["bg.ref"]) # todo: drop mut_len in output files??
-                .sort("pos")
-    )
-
-    # final.write_csv("tmp.tsv", separator="\t", include_header=True)
-    final.write_csv(args.query+"_"+args.o, separator="\t", include_header=True)
+            
+    return 0
 
 
 def main():
@@ -166,8 +112,9 @@ def main():
     parser.add_argument("-a", help="Alignment file path from gofasta in FASTA format, including bakground genome and query genomes.", required=True)
     parser.add_argument("--gff", help="GFF file to extract gene features and sra.", required=True)
     parser.add_argument("-o", help="Output name for new mutation file in TSV format.", default="mutations.tsv")
-    parser.add_argument("--bg", help="ID of background genome", required=True, type=str)
-    parser.add_argument("--query", help="ID of query genom", required=True, type=str)
+    parser.add_argument("--bg", help="ID of background genome.", required=True, type=str)
+    parser.add_argument("--query", help="ID of query genom.", required=True, type=str)
+    parser.add_argument("--region", help="Region of mutations.", required=True, type=str)
     args = parser.parse_args()
 
     translate_mutations(args)
@@ -176,10 +123,10 @@ def main():
 if __name__ == '__main__':
     main()
 
-# cmd to test locally:
 # python /home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py \
-#   -m /home/eleanor124/projects/bjorn_rep/data/testing/mutations.tsv \
-#   -a /home/eleanor124/projects/bjorn_rep/data/testing/HU1_BA1_BA2_final.fa \
-#   --gff /home/eleanor124/projects/bjorn_rep/data/NC_045512.2.gff \
+#   -m /home/eleanor124/projects/bjorn_rep/output/Hu1/mutations.tsv \
+#   -a /home/eleanor124/projects/bjorn_rep/all_ali_asm20.fasta \
+#   --gff /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
 #   --bg NC_045512.2 \
-#   --query NC_045512.2_BA.1 
+#   --query NC_045512.2_BA.1 \
+#   --region NC_045512.2

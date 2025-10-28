@@ -8,10 +8,14 @@ process GOFASTA_SAM_VARIANTS {
 
     script:
     """
+    mkdir -p ${params.outdir}
+
     gofasta sam variants -s ${alignment_sam} \\
                          -a ${params.gff_file} \\
                          --append-snps \\
                          -o aa_changes.csv
+
+    cp -p aa_changes.csv ${params.outdir}/aa_changes.csv
     """
 }
 
@@ -25,11 +29,15 @@ process GOFASTA_VARIANTS {
 
     script:
     """
+    mkdir -p ${params.outdir}
+
     gofasta variants --msa ${alignment_fasta} \\
                      --reference ${params.ref_id} \\
                      -a ${params.gff_file} \\
                      --append-snps \\
                      -o aa_changes.csv
+                     
+    cp -p aa_changes.csv ${params.outdir}/aa_changes.csv
     """
 }
 
@@ -43,8 +51,6 @@ process GOFASTA_CONVERT {
 
     script:
     """
-    mkdir -p ${params.outdir}
-
     gofasta_converter.py --csv_path ${aa_changes_csv} \\
                         --reference ${params.ref_file} \\
                         --region ${params.region} \\

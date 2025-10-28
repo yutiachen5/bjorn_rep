@@ -12,13 +12,13 @@ workflow EXTRACT_MUTATIONS {
     metadata_ch
 
     main:
+        // Extract mutations
         if (params.sampling) {
             fasta_files = SAMPLING(params.fasta_dir).selected_fasta
         } else {
             fasta_files = GET_ALL_FASTA(params.fasta_dir).all_fasta
         }
         
-        log.info "Extracting mutations..."
         fasta_ch = fasta_files
                     .splitText()
                     .map{ filename -> 
@@ -31,13 +31,33 @@ workflow EXTRACT_MUTATIONS {
 
         mutations_tsv = MUTATIONS_ANALYSIS_WORKFLOW(combined_fasta_ch).mutations_tsv
 
-        if (params.query_id == null) {
+        // Translate mutations
+        if (!params.query_id || params.query_id.toString().trim() == '') {
+            // No input provided
             query_id_ch = Channel.empty()
         } else {
-            Channel
-                .fromList(params.query_id)
-                .set { query_id_ch }
+            def query_ids = []
+
+            if (params.query_id instanceof String) {
+                // Handle any separators: comma, space, or both
+                query_ids = params.query_id
+                    .replaceAll(/[\[\]"]/, '')     // remove brackets or quotes like ["A","B","C"]
+                    .split(/[,\s]+/)               // split by comma or any whitespace
+                    .collect { it.trim() }         // trim each
+                    .findAll { it }                // remove empties
+            }
+            else if (params.query_id instanceof List) {
+                // Already a list (e.g. --query_id '[A,B,C]')
+                query_ids = params.query_id.collect { it.toString().trim() }
+            }
+            else {
+                // Fallback in rare cases
+                query_ids = [ params.query_id.toString().trim() ]
+            }
+
+            query_id_ch = query_ids ? Channel.fromList(query_ids) : Channel.empty()
         }
+
 
         if (params.translate_mutations) {
             QUERY_GENOMES(mutations_tsv, query_id_ch)

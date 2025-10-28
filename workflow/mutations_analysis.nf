@@ -13,12 +13,16 @@ workflow MUTATIONS_ANALYSIS_WORKFLOW {
     main:
         alignment_sam = MINIMAP(combined_fasta_ch).alignment_sam
 
-        // alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta
-        // mutations_csv = GOFASTA_VARIANTS(alignment_fasta).aa_changes_csv
-        // mutations_tsv = GOFASTA_CONVERT(mutations_csv).mutations_tsv
+        if (params.gofasta) {
+            alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta
+            mutations_csv = GOFASTA_VARIANTS(alignment_fasta).aa_changes_csv
+            mutations_tsv = GOFASTA_CONVERT(mutations_csv).mutations_tsv
+        } else {
+            alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta.collect()
+            mutations_tsv = CALL_MUTATION(alignment_fasta).mutations_tsv
+        }
 
-        alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta.collect()
-        mutations_tsv = CALL_MUTATION(alignment_fasta).mutations_tsv
+
 
     emit:
         mutations_tsv

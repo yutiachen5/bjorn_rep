@@ -25,7 +25,7 @@ def sampling(args):
     else:
         all_samples = [os.path.join(args.fasta_dir, f) \
                         for f in os.listdir(args.fasta_dir) if os.path.isfile(os.path.join(args.fasta_dir, f))]
-        selected_fasta = random.sample(all_samples, min(args.n, len(all_samples)))
+        selected_fasta = random.sample(all_samples, min(args.nsamples, len(all_samples)))
 
         with open("fasta_files.txt", "w") as outfile:
             # outfile.write(args.ref + "\n")
@@ -35,7 +35,7 @@ def sampling(args):
 def main():
     parser = argparse.ArgumentParser(description="Randomly select n samples from all input fasta files.")
     parser.add_argument("--fasta_dir", help="Input fasta dir", required=True)
-    parser.add_argument("-n", help="Number of samples.", default=100, type=int)
+    parser.add_argument("--nsamples", help="Number of samples.", default=100, type=int)
     parser.add_argument("-l", help="Lineage name for extracting mutations.")
     parser.add_argument("--lineage_file", help="Lineage file in CVS format.")
     # parser.add_argument("--ref", help="Path of reference genome in FASTA format")

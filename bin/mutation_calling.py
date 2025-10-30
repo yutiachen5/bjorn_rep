@@ -28,6 +28,11 @@ def get_gff_feature(pos, gff):
 
     return match["GFF_FEATURE"].to_list() if match.height > 0 else []
 
+def parse_query_ids(query_id):
+    s = str(s).strip()
+    s = re.sub(r'[\[\]"\']', '', s)
+
+    return [q.strip() for q in re.split(r'[,\s]+', s) if q.strip()]
     
 def mutation_calling(args):
     records = list(SeqIO.parse(args.a, "fasta"))
@@ -37,6 +42,8 @@ def mutation_calling(args):
     assert len(set(seq_len)) == 1, "Sequence lengths mismatch!"
 
     length = seq_len.pop()
+    query_ids = parse_query_ids(args.query_id)
+    n_ref = len(query_ids)
 
     with open(args.o, "w", newline="") as outfile:
         header = ["sra", "region", "pos", "ref", "alt", "GFF_FEATURE", "mut_len"]
@@ -44,7 +51,7 @@ def mutation_calling(args):
 
         ref_seq = str(records[0].seq)
 
-        for record in records[1:]:
+        for record in records[1 + n_ref: ]: # refs are put at the top of this file
             i = 0
 
             alt_seq = str(record.seq)
@@ -101,10 +108,13 @@ def main():
     parser.add_argument("--gff", help="GFF file to extract gene features and sra.", required=True)
     parser.add_argument("-o", help="Output name for new mutation file in TSV format.", default="mutations.tsv")
     parser.add_argument("--region", help="Region of reference genome.", required=True, type=str)
+    parser.add_argument("--ref_id", help="ID of background reference genome.", required=True, type=str)
+    parser.add_argument("--query_id", help="ID of query reference genome.", required=True, type=str)
 
     args = parser.parse_args()
 
     mutation_calling(args)
+    
 
     
 if __name__ == '__main__':

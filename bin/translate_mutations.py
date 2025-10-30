@@ -103,8 +103,6 @@ def translate_mutations(args):
                             outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], bg_seq[i], g]) + "\n")
 
             
-    return 0
-
 
 def main():
     parser = argparse.ArgumentParser(description="Extract differences between Hu-1 and other references to infer mutations on other refences.")

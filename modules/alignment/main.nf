@@ -12,7 +12,7 @@ process MINIMAP {
     cat ${params.ref_file} ${query_seq} > query.fasta
 
     minimap2 -a \\
-             -x map-ont \\
+             -x asm20 \\
              --score-N=0 \\
              --sam-hit-only \\
              --secondary=no \\
@@ -25,19 +25,14 @@ process MINIMAP {
 
 process MAFFT {
     input:
-    path ref_genome
-    path query_genome
+    path query_seq
 
     output:
     path "mafft.fasta", emit: mafft_fasta
 
     script:
     """
-    cat ${ref_genome} ${query_genome} > cat_tmp.fasta
-    
-    mafft cat_tmp.fasta > mafft_alignment.fasta
-
-    seqkit seq -w 0 mafft_alignment.fasta > mafft.fasta
+    mafft --auto --keeplength --addfragments ${query_seq} ${params.ref_file} | seqkit seq -w 0 > mafft.fasta
     """
 }
 

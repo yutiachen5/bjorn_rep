@@ -24,9 +24,8 @@ def helpMessage() {
     -------------------------
     Required parameters:
       --fasta_dir       Path to directory containing sample FASTA files
-      --ref_file        Reference FASTA file
+      --ref_file        Reference FASTA file, which contains all ref genomes 
       --gff_file        GFF annotation file
-      --query           Query FASTA file
       --region          Region name (e.g. PP755596.1)
       --outdir          Output directory
 
@@ -36,7 +35,7 @@ def helpMessage() {
                         Examples:
                             --query_id A
                             --query_id A,B,C
-                            --query_id 'lcl|CY018884.1_cds_ABM21959.1_1,lcl|CY018885.1_cds_ABM21960.1_1'
+                            --query_id 'CY018884.1_cds_ABM21959.1_1,CY018885.1_cds_ABM21960.1_1'
 
       --nsamples        Number of random samples (default: 1000)
       -c nf.config      Use custom configuration file

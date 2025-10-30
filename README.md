@@ -31,12 +31,11 @@ with manual mutation calling
 ```
 nextflow run main.nf \
    --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
-   --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
+   --ref_file $PWD/data/Hu1-BA/ref_all.fasta \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --translate_mutations true \
    --ref_id NC_045512.2 \
    --query_id NC_045512.2_BA.1,NC_045512.2_BA.2 \
-   --query_file $PWD/data/Hu1-BA/BA.1_and_BA.2.fa \
    --region NC_045512.2 \
    --nsamples 1000 \
    --outdir $PWD/output/Hu1/ \
@@ -69,7 +68,7 @@ nextflow run main.nf \
    --outdir $PWD/output/PB2 \
    --ref_id PP755596.1_cds_XAJ25426.1_1 \
    --query_id CY018884.1_cds_ABM21959.1_1 \
-   --nsamples 1000 \
+   --sampling false \
    -c nf.config
 ```
 

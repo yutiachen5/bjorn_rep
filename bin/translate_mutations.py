@@ -56,7 +56,7 @@ def match_del(pos, s, deletion):
 def translate_mutations(args):
     mutation = pd.read_csv(args.m, sep="\t", header=0)
     deletion = mutation[mutation["alt"].str.startswith("-")].copy()
-    deletion["end"] = deletion["pos"] + deletion["mut_len"]
+    deletion["end"] = deletion["pos"] + deletion["alt"].apply(lambda x: len(x)-1)
     deletion["start"] = deletion["pos"] + 1
 
     ref_variants, ref_dic = extract_ref_variants(args) # ref_variants: {"pos": 2, "Hu1": "A", "BA1": "T"}
@@ -122,8 +122,8 @@ if __name__ == '__main__':
     main()
 
 # python /home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py \
-#   -m /home/eleanor124/projects/bjorn_rep/output/Hu1/mutations.tsv \
-#   -a /home/eleanor124/projects/bjorn_rep/all_ali_asm20.fasta \
+#   -m /home/eleanor124/projects/bjorn_rep/mutations.tsv \
+#   -a /home/eleanor124/projects/bjorn_rep/work/d5/e42de4f8652ef31ae936f7b3a1a0a4/alignment.fasta \
 #   --gff /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
 #   --bg NC_045512.2 \
 #   --query NC_045512.2_BA.1 \

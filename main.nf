@@ -13,8 +13,8 @@ def validateParameters() {
     if (!params.fasta_dir) {
         exit 1, "Input FASTA directory not specified!"
     }
-    if (params.translate_mutations && !params.query_file) {
-        exit 1, "Query genome not specified!"
+    if (params.translate_mutations && !params.query_ref_file) {
+        exit 1, "ID of query genome not specified for translation!"
     }
 }
 
@@ -52,13 +52,6 @@ workflow {
 
     validateParameters()
 
-    // segments_ch = Channel.empty()
-
-    // metadata_ch = Channel.fromPath(params.metadata)
-    metadata_ch = Channel.empty()
-
-    // EXTRACT_MUTATIONS(metadata_ch)
-
-    mutation_ch = EXTRACT_MUTATIONS(metadata_ch).mutations_tsv
+    mutation_ch = EXTRACT_MUTATIONS().mutations_tsv
 
 }

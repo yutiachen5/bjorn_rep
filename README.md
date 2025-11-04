@@ -31,24 +31,22 @@ with manual mutation calling
 ```
 nextflow run main.nf \
    --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
-   --ref_file $PWD/data/Hu1-BA/ref_all.fasta \
+   --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
+   --query_ref_file $PWD/data/Hu1-BA/BA.1_and_BA.2.fa \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --translate_mutations true \
-   --ref_id NC_045512.2 \
-   --query_id NC_045512.2_BA.1,NC_045512.2_BA.2 \
    --region NC_045512.2 \
    --nsamples 1000 \
    --outdir $PWD/output/Hu1/ \
    -c nf.config
 ```
 
-with gofasta mutation calling (no translation)
+with gofasta mutation calling (no translation) - somthing weird in BA1 is happening
 ```
 nextflow run main.nf \
    --gofasta true \
    --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
    --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
-   --ref_id NC_045512.2 \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --translate_mutations false \
    --nsamples 1000 \
@@ -63,7 +61,6 @@ nextflow run main.nf \
    --fasta_dir $PWD/data/PB2-DMS/PB2_samples/ \
    --ref_file $PWD/data/PB2-DMS/PP755596.1.fasta \
    --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
-   --query_file $PWD/data/PB2-DMS/CY018884.1.fasta \
    --region PP755596.1 \
    --outdir $PWD/output/PB2 \
    --ref_id PP755596.1_cds_XAJ25426.1_1 \

@@ -23,6 +23,7 @@ process GOFASTA_SAM_VARIANTS {
 process GOFASTA_VARIANTS {
     input:
     path alignment_fasta
+    val ref_id
 
     output:
     path "aa_changes.csv", emit: aa_changes_csv
@@ -32,7 +33,7 @@ process GOFASTA_VARIANTS {
     mkdir -p ${params.outdir}
 
     gofasta variants --msa ${alignment_fasta} \\
-                     --reference ${params.ref_id} \\
+                     --reference ${ref_id} \\
                      -a ${params.gff_file} \\
                      --append-snps \\
                      -o aa_changes.csv
@@ -64,6 +65,7 @@ process GOFASTA_CONVERT {
 process CALL_MUTATION {
     input:
     path alignment_fasta
+    val ref_id
     
     output:
     path "mutations.tsv", emit: mutations_tsv
@@ -72,9 +74,13 @@ process CALL_MUTATION {
     """
     mkdir -p ${params.outdir}
 
+    cat ${params.ref_file} ${params.query_ref_file} > ref_all.fasta
+
     mutation_calling.py -a ${alignment_fasta} \\
                         --gff ${params.gff_file} \\
                         --region ${params.region} \\
+                        --ref_file ref_all.fasta \\
+                        --ref_id ${ref_id} \\
                         -o mutations.tsv
 
     cp -p mutations.tsv ${params.outdir}/mutations.tsv

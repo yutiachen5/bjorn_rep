@@ -1,3 +1,21 @@
+process MAKE_COMBINED_FASTA {
+    input:
+    val fasta_files
+
+    output:
+    path "combined.fasta", emit: combined_fasta
+
+    script:
+    """
+    mkdir -p ${params.outdir}
+
+    cat ${fasta_files.join(' ')} > combined.fasta
+
+    cp -p combined.fasta ${params.outdir}/combined.fasta
+    """
+}
+
+
 process MINIMAP {
     input:
     path query_seq
@@ -9,16 +27,19 @@ process MINIMAP {
     """
     mkdir -p ${params.outdir}
 
-    cat ${params.ref_file} ${query_seq} > query.fasta
+    if [ -f "${params.query_ref_file}" ]; then
+        cat ${params.ref_file} ${params.query_ref_file} ${query_seq} > all_seq.fasta
+    else
+        cat ${params.ref_file} ${query_seq} > all_seq.fasta
+    fi
 
     minimap2 -a \\
              -x asm20 \\
              --score-N=0 \\
              --sam-hit-only \\
              --secondary=no \\
-             ${params.ref_file} query.fasta > alignment.sam
+             ${params.ref_file} all_seq.fasta > alignment.sam
 
-    cp -p query.fasta ${params.outdir}/query.fasta
     cp -p alignment.sam ${params.outdir}/alignment.sam
     """
 }

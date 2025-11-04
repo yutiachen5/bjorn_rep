@@ -14,8 +14,9 @@ def sampling(args):
         df["prefix"] = df['lineage'].str.extract("([A-Za-z]+)(?=\.\d+)")
         df["prefix"] = df["prefix"].fillna(df["lineage"])
         selected_fasta = list(df.loc[df["prefix"] == args.l, :]["taxon"])
+        selected_fasta = sorted(selected_fasta)
 
-        with open("fasta_files.txt", "w") as outfile:
+        with open(args.o, "w") as outfile:
             # outfile.write(args.ref + "\n")
             for f in selected_fasta:
                 if os.path.isfile(os.path.join(args.fasta_dir, f+".fasta")):
@@ -26,9 +27,9 @@ def sampling(args):
         all_samples = [os.path.join(args.fasta_dir, f) \
                         for f in os.listdir(args.fasta_dir) if os.path.isfile(os.path.join(args.fasta_dir, f))]
         selected_fasta = random.sample(all_samples, min(args.nsamples, len(all_samples)))
+        selected_fasta = sorted(selected_fasta)
 
-        with open("fasta_files.txt", "w") as outfile:
-            # outfile.write(args.ref + "\n")
+        with open(args.o, "w") as outfile:
             for f in selected_fasta:
                 outfile.write(f + "\n")
     
@@ -38,7 +39,7 @@ def main():
     parser.add_argument("--nsamples", help="Number of samples.", default=100, type=int)
     parser.add_argument("-l", help="Lineage name for extracting mutations.")
     parser.add_argument("--lineage_file", help="Lineage file in CVS format.")
-    # parser.add_argument("--ref", help="Path of reference genome in FASTA format")
+    parser.add_argument("-o", help="Output file location.")
 
     args = parser.parse_args()
 

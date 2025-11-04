@@ -2,7 +2,6 @@
 
 include { MAFFT } from '../modules/alignment/main.nf'
 include { MINIMAP } from '../modules/alignment/main.nf'
-include { MINIMAP_ASM20 } from '../modules/alignment/main.nf'
 include { TRANSLATE_MUTATIONS } from '../modules/mutation_translation/main.nf'
 include { GOFASTA_ALIGNMENT } from '../modules/alignment/main.nf'
 
@@ -12,19 +11,9 @@ workflow QUERY_GENOMES {
         query_id_ch
 
     main:
-        // mafft_ch = MAFFT(params.ref_file, params.query).mafft_fasta.collect()
-
-        // alignment_sam = MINIMAP(params.query_file).alignment_sam
-        
-        // alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta.collect()
-
         query_id_ch
             .combine(alignment_fasta)
             .combine(mutation_ch)
             | TRANSLATE_MUTATIONS
-
-        // TRANSLATE_MUTATIONS(alignment_fasta, mutation_ch.collect(), query_id_ch)
-
-    // emit:
 
 }

@@ -37,7 +37,7 @@ nextflow run main.nf \
    --query_ref_file $PWD/data/Hu1-BA/BA.1_and_BA.2.fa \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --region NC_045512.2 \
-   --outdir $PWD/output/Hu1/ \
+   --outdir $PWD/output/Hu1/mm \
    -c nf.config
 ```
 
@@ -51,7 +51,7 @@ nextflow run main.nf \
    --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --region NC_045512.2 \
-   --outdir $PWD/output/Hu1/gofasta \
+   --outdir $PWD/output/Hu1/gf_Hu1 \
    -c nf.config
 ```
 
@@ -64,7 +64,7 @@ nextflow run main.nf \
    --query_ref_file $PWD/data/PB2-DMS/CY018884.1.fasta \
    --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
    --region PB2 \
-   --outdir $PWD/output/PB2 \
+   --outdir $PWD/output/PB2/mm \
    -c nf.config
 ```
 
@@ -78,6 +78,6 @@ nextflow run main.nf \
    --ref_file $PWD/data/PB2-DMS/PP755596.1.fasta \
    --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
    --region PB2 \
-   --outdir $PWD/output/PB2/gofasta \
+   --outdir $PWD/output/PB2/gf_PP \
    -c nf.config
 ```

@@ -1,20 +1,3 @@
-process MAKE_COMBINED_FASTA {
-    input:
-    val fasta_files
-
-    output:
-    path "combined.fasta", emit: combined_fasta
-
-    script:
-    """
-    mkdir -p ${params.outdir}
-
-    cat ${fasta_files.join(' ')} > combined.fasta
-
-    cp -p combined.fasta ${params.outdir}/combined.fasta
-    """
-}
-
 
 process MINIMAP {
     input:
@@ -40,6 +23,7 @@ process MINIMAP {
              --secondary=no \\
              ${params.ref_file} all_seq.fasta > alignment.sam
 
+    cp -p all_seq.fasta ${params.outdir}/all_seq.fasta
     cp -p alignment.sam ${params.outdir}/alignment.sam
     """
 }

@@ -69,6 +69,7 @@ process CALL_MUTATION {
     
     output:
     path "mutations.tsv", emit: mutations_tsv
+    path "del_helper.tsv", emit: del_helper_tsv
 
     script:
     """
@@ -84,5 +85,6 @@ process CALL_MUTATION {
                         -o mutations.tsv
 
     cp -p mutations.tsv ${params.outdir}/mutations.tsv
+    cp -p del_helper.tsv ${params.outdir}/del_helper.tsv
     """
 }

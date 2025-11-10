@@ -2,6 +2,10 @@
 /.nextflow
 /data
 /output
+/testing
 *.txt
 *.log
+*.fasta
+*.sam
+*.fa
 .nextflow.log*

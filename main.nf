@@ -53,5 +53,4 @@ workflow {
     validateParameters()
 
     mutation_ch = EXTRACT_MUTATIONS().mutations_tsv
-
 }

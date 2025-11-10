@@ -3,10 +3,8 @@
 import re
 import argparse
 import pandas as pd
-import polars as pl
 from Bio import SeqIO
 
-pl.Config.set_tbl_cols(-1)   
 
 def extract_ref_variants(args): 
     records = list(SeqIO.parse(args.a, "fasta"))
@@ -15,15 +13,18 @@ def extract_ref_variants(args):
     assert len(seq_len) == 1, "Sequence length mismatch!"
     length = seq_len.pop()
 
-    ids = [args.bg, args.query]
-    ref_dic = {record.id: record.seq for record in records if record.id in ids}
+    ref_records = records[:args.n_ref] # refs are put at the top of alignment file
+    ref_dic = {record.id: record.seq for record in ref_records if record.id in [args.bg, args.query]}
+
+    sample_records = records[args.n_ref:]
+    sra = [s.id for s in sample_records]
 
     references = []
     for i in range(length): 
         if ref_dic[args.bg][i] != ref_dic[args.query][i]:
             references.append({"pos": i+1, "bg.ref":ref_dic[args.bg][i], "q.ref":ref_dic[args.query][i]}) # 1-based index
 
-    return pl.DataFrame(references), ref_dic
+    return pd.DataFrame(references), ref_dic, sra
 
 def get_gff_feature(pos, gff):
     match = gff[(gff["start"] <= pos) & (pos <= gff["end"])]
@@ -48,6 +49,20 @@ def parse_gff(gff_path):
 
     return pd.DataFrame(gff)
 
+def extract_del(mutation, helper):
+    # region covered by normal del
+    deletion = mutation[(mutation["alt"].str.startswith("-"))].copy()
+    deletion["start"] = deletion["pos"] + 1
+    deletion["end"] = deletion["pos"] + deletion["alt"].apply(lambda x: len(x)-1)
+
+    # region covered by leading or trailing del
+    helper["start"] = helper["pos"] + 1
+    helper["end"] = helper["pos"] + helper["alt"].apply(lambda x: len(x)-1)
+
+    deletion = pd.concat([deletion, helper], axis=0)
+
+    return deletion
+
 def match_del(pos, s, deletion):
     match = deletion[(deletion["start"] <= pos) & (pos <= deletion["end"]) & (deletion["sra"] == s)]
 
@@ -55,14 +70,12 @@ def match_del(pos, s, deletion):
 
 def translate_mutations(args):
     mutation = pd.read_csv(args.m, sep="\t", header=0)
-    deletion = mutation[mutation["alt"].str.startswith("-")].copy()
-    deletion["end"] = deletion["pos"] + deletion["alt"].apply(lambda x: len(x)-1)
-    deletion["start"] = deletion["pos"] + 1
+    helper = pd.read_csv(args.d, sep="\t", header=0)
+    deletion = extract_del(mutation, helper)
 
-    ref_variants, ref_dic = extract_ref_variants(args) # ref_variants: {"pos": 2, "Hu1": "A", "BA1": "T"}
+    ref_variants, ref_dic, sample_id = extract_ref_variants(args) # ref_variants: {"pos": 2, "Hu1": "A", "BA1": "T"}
     gff = parse_gff(args.gff)
 
-    sample_id = mutation["sra"].unique()
     bg_seq, q_seq = ref_dic[args.bg], ref_dic[args.query]
     length = len(bg_seq)
 
@@ -73,7 +86,7 @@ def translate_mutations(args):
     # case3: mut on new ref only (old_alt == bg.ref != q.ref), write for all samples: ref = q.ref, alt = bg.ref 
     # case4: bg.ref == q.ref, write the current mut: ref = old_ref, alt = old_alt
 
-    with open(args.query+"_"+args.o, "w") as outfile:
+    with open(args.o, "w") as outfile:
         outfile.write("\t".join(header) + "\n")
 
         for i in range(length):
@@ -97,7 +110,6 @@ def translate_mutations(args):
                         else: # case 2: alt != bg.ref & alt != q.ref
                             for g in gff_feature:
                                 outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], alt, g]) + "\n")
-
                     else: # case 3: alt == bg.ref
                         for g in gff_feature:
                             outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], bg_seq[i], g]) + "\n")
@@ -107,11 +119,13 @@ def translate_mutations(args):
 def main():
     parser = argparse.ArgumentParser(description="Extract differences between Hu-1 and other references to infer mutations on other refences.")
     parser.add_argument("-m", help="Mutation file path in TSV format.", required=True)
+    parser.add_argument("-d", help="Helper mutation file path in TSV format to deal with leading and trailing dels.", required=True)
     parser.add_argument("-a", help="Alignment file path from gofasta in FASTA format, including bakground genome and query genomes.", required=True)
     parser.add_argument("--gff", help="GFF file to extract gene features and sra.", required=True)
     parser.add_argument("-o", help="Output name for new mutation file in TSV format.", default="mutations.tsv")
     parser.add_argument("--bg", help="ID of background genome.", required=True, type=str)
     parser.add_argument("--query", help="ID of query genom.", required=True, type=str)
+    parser.add_argument("--n_ref", help="Number of reference genomes.", required=True, type=int)
     parser.add_argument("--region", help="Region of mutations.", required=True, type=str)
     args = parser.parse_args()
 

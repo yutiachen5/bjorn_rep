@@ -2,16 +2,22 @@
 
 REF="$1"
 QUERY="$2"
-OUT_PREFIX="$3"
+GFF="$3"
+OUT_PREFIX="$4"
 
-minimap2 -a -t 1 -x asm20 --score-N=0 --secondary=no "$REF" "$QUERY" > "${OUT_PREFIX}.sam" 
+mkdir -p ./testing/${OUT_PREFIX}
+
+cd ./testing/${OUT_PREFIX}
+
+minimap2 -a -x asm20 --score-N=0 --sam-hit-only --secondary=no "$REF" "$QUERY" > "alignment.sam" 
 
 gofasta sam toMultiAlign \
-    -s "${OUT_PREFIX}.sam" \
+    -s "alignment.sam" \
     -r "${REF}" \
-    -o "${OUT_PREFIX}.fasta"
+    -o "alignment.fasta"
 
-# gofasta_converter.py --csv_path ${aa_changes_csv} \\
-#                     --reference ${params.ref_file} \\
-#                     --region ${params.region} \\                    
-#                     --output mutations.tsv
+gofasta variants --msa "alignment.fasta" \
+                    --reference CY018884.1_cds_ABM21959.1_1 \
+                    -a "${GFF}" \
+                    --append-snps \
+                    -o "aa_changes.csv"

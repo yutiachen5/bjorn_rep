@@ -5,9 +5,10 @@ import pandas as pd
 import random
 import argparse
 
-random.seed(42)
 
 def sampling(args):
+    random.seed(args.s)
+
     # select samples from certain lineage
     if getattr(args, "l", None):
         df = pd.read_csv(args.lineage_file)
@@ -40,6 +41,7 @@ def main():
     parser.add_argument("-l", help="Lineage name for extracting mutations.")
     parser.add_argument("--lineage_file", help="Lineage file in CVS format.")
     parser.add_argument("-o", help="Output file location.")
+    parser.add_argument("-s", help="Random seed for sampling.", default=42)
 
     args = parser.parse_args()
 

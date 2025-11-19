@@ -4,6 +4,8 @@ import re
 import argparse
 import pandas as pd
 from Bio import SeqIO
+from tqdm import tqdm
+
 
 def extract_ref_variants(args): 
     records = list(SeqIO.parse(args.a, "fasta"))
@@ -85,42 +87,87 @@ def translate_mutations(args):
     # case3: mut on new ref only (old_alt == bg.ref != q.ref), write for all samples: ref = q.ref, alt = bg.ref 
     # case4: bg.ref == q.ref, write the current mut: ref = old_ref, alt = old_alt
 
+    mutation_by_pos = dict(tuple(mutation.groupby("pos")))
+
+    # empty df for positions with no mutation
+    EMPTY = pd.DataFrame(columns=mutation.columns)
+
+    # set of positions where background ref != query ref
+    bg_diff_pos = set(ref_variants["pos"].tolist())
     with open(args.o, "w") as outfile:
         outfile.write("\t".join(header) + "\n")
 
-        for i in range(length):
-            if (i+1) not in ref_variants["pos"].to_list(): # case 4: bg.ref == q.ref
-                tmp_ins_snp = mutation[(mutation["pos"] == i+1) & (~mutation["alt"].str.startswith("-"))]
-                tmp_ins_snp.to_csv(outfile, sep="\t", header=False, index=False)
+        for i in tqdm(range(length)):
+            pos = i + 1 # 1-based index
+            gff_feature = get_gff_feature(pos, gff)
 
-                tmp_del = mutation[(mutation["pos"] == i+1) & (mutation["alt"].str.startswith("-"))]
+            # get mutation rows at this pos
+            tmp = mutation_by_pos.get(pos, EMPTY)
+            if not tmp.empty:
+                tmp = tmp.set_index("sra")
+            tmp_samples = set(tmp.index)
+
+            # ---------------------------------------------------
+            # CASE 4: background ref == query ref
+            # ---------------------------------------------------
+            if pos not in bg_diff_pos:
+                # SNP + INS
+                tmp_ins_snp = mutation[
+                    (mutation["pos"] == pos) &
+                    (~mutation["alt"].str.startswith("-"))
+                ]
+                if not tmp_ins_snp.empty:
+                    tmp_ins_snp.to_csv(outfile, sep="\t", header=False, index=False, mode="a")
+
+                # DEL 
+                tmp_del = mutation[
+                    (mutation["pos"] == pos) &
+                    (mutation["alt"].str.startswith("-"))
+                ]
                 if not tmp_del.empty:
-                    tmp_del = tmp_del.copy()   
+                    tmp_del = tmp_del.copy()
                     tmp_del["alt"] = tmp_del.apply(
-                        lambda row: "-" + q_seq[row["pos"] : row["pos"]+len(row["alt"])-1],
+                        lambda row: "-" + q_seq[row["pos"]: row["pos"]+(len(row["alt"])-1)],
                         axis=1
                     )
-                    tmp_del.to_csv(outfile, sep="\t", header=False, index=False)
-            else:
-                gff_feature = get_gff_feature(i+1, gff) 
+                    tmp_del.to_csv(outfile, sep="\t", header=False, index=False, mode="a")
 
-                tmp = mutation[mutation["pos"] == i+1]
-                tmp_sample = list(tmp["sra"])
+            # -------------------------------------------------------
+            # CASES 1, 2, 3: background ref != query ref
+            # -------------------------------------------------------
 
-                for s in sample_id:
-                    del_match = match_del(i+1, s, deletion)
-                    if del_match:
+            for s in sample_id:
+                # skip samples affected by deletion
+                if match_del(pos, s, deletion):
+                    continue
+
+                if s in tmp_samples: # mut exists in old mut file
+                    alt = tmp.loc[s, "alt"]
+
+                    # case 1: alt == q.ref
+                    if alt == q_seq[i]:
                         continue
-                    if s in tmp_sample: # alt != bg.ref
-                        alt = tmp.loc[tmp["sra"] == s, "alt"].iloc[0]
-                        if alt == q_seq[i]: # case 1: alt != bg.ref & alt == q.ref
-                            continue
-                        else: # case 2: alt != bg.ref & alt != q.ref
-                            for g in gff_feature:
-                                outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], alt, g]) + "\n")
-                    else: # case 3: alt == bg.ref
-                        for g in gff_feature:
-                            outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], bg_seq[i], g]) + "\n")
+
+                    # case 2: alt != q.ref
+                    final_alt = alt
+
+                # case 3: no mutation → alt == bg.ref
+                else:
+                    final_alt = bg_seq[i]
+
+                # emit rows for each GFF feature
+                for g in gff_feature:
+                    outfile.write(
+                        "\t".join([
+                            s,
+                            args.region,
+                            str(pos),
+                            q_seq[i],
+                            final_alt,
+                            g
+                        ]) + "\n"
+                    )
+
 
             
 
@@ -143,7 +190,7 @@ def main():
 if __name__ == '__main__':
     main()
 
-# python /home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py \
+# python /home/eleanor124/projects/bjorn_rep/bin/translate.py \
 #   -m /home/eleanor124/projects/bjorn_rep/output/PB2/mm/mutations.tsv \
 #   -a /home/eleanor124/projects/bjorn_rep/output/PB2/mm/alignment.fasta \
 #   --gff /home/eleanor124/projects/bjorn_rep/data/PB2-DMS/PP755596.1.gff \

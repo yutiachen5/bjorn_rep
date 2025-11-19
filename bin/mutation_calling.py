@@ -26,15 +26,28 @@ def parse_gff_file(gff_path):
 def get_gff_feature(gff, pos): # pos: 1-based
     match = gff.filter((pl.col("start") <= pos) & (pos <= pl.col("end"))) # GFF intervals are 1-based, inclusive
 
-    return match["GFF_FEATURE"].to_list() if match.height > 0 else []
+    if match.height > 0:
+        gff_feature = match["GFF_FEATURE"].to_list()
+        start = match["start"].to_list()
+        end = match["end"].to_list()
+    else:
+        gff_feature, start, end = [], [], []
 
-def get_codon_aa(ref_seq, alt_seq, pos): # pos: 1-based
-    start = ((pos-1) // 3)*3
-    ref_codon = ref_seq[start: start + 3]
-    alt_codon = alt_seq[start: start + 3]
+    return gff_feature, start, end
+
+def get_codon_aa(ref_seq, alt_seq, pos, start, end): # pos: 1-based
+    codon_start = (pos-start)//3*3 + start - 1
+    if codon_start + 3 > end:
+        raise Exception ("codon index exceeds the CDS interval")
+
+    ref_codon = ref_seq[codon_start: codon_start + 3]
+    alt_codon = alt_seq[codon_start: codon_start + 3]
 
     ref_aa = Seq(ref_codon).translate(table=1)
-    alt_aa = Seq(alt_codon).translate(table=1)
+    try:
+        alt_aa = Seq(alt_codon).translate(table=1)
+    except:
+        alt_aa = ""
 
     return ref_codon, alt_codon, ref_aa, alt_aa
 
@@ -69,16 +82,11 @@ def mutation_calling(args):
 
         for record in records[n_ref: ]: # refs are put at the top of this file
             i = 0
-
             alt_seq = str(record.seq).upper()
-
-            # skip the seq with more than x% gaps or missing values
-            # if (alt_seq.count("-")+alt_seq.count("N")) / length > 0.77:
-            #     continue
 
             while i < length:
                 if ref_seq[i] != alt_seq[i]:
-                    gff_feature = get_gff_feature(gff, i+1)
+                    gff_feature, start, end = get_gff_feature(gff, i+1) # only do gff feature for SNP???
 
                     # DEL
                     if alt_seq[i] == "-": 
@@ -92,12 +100,7 @@ def mutation_calling(args):
                             i = j + 1
                             continue
                         
-                        if gff_feature:
-                            for g in gff_feature:
-                                # ref_codon, alt_codon, ref_aa, alt_aa = get_codon_aa(ref_seq, alt_seq, i+1) 
-                                outfile.write(f"{record.id}\t{args.region}\t{i}\t{ref_seq[i-1]}\t-{deleted}\t{g}\n") # use the preceding nuc as ref
-                        else:
-                            outfile.write(f"{record.id}\t{args.region}\t{i}\t{ref_seq[i-1]}\t-{deleted}\t""\n") 
+                        outfile.write(f"{record.id}\t{args.region}\t{i}\t{ref_seq[i-1]}\t-{deleted}\t""\t""\t""\t""\t""\n") 
 
                         i = j + 1
                         continue
@@ -113,13 +116,8 @@ def mutation_calling(args):
                         # if i == 0 or j == length - 1:
                         #     i = j + 1
                         #     continue
-                        
-                        if gff_feature:
-                            for g in gff_feature:
-                                # ref_codon, alt_codon, ref_aa, alt_aa = get_codon_aa(ref_seq, alt_seq, i+1) 
-                                outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t{g}\n")
-                        else:
-                            outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t""\n")
+
+                        outfile.write(f"{record.id}\t{args.region}\t{i+1}\t-\t+{inserted}\t""\t""\t""\t""\t""\n")
 
                         i = j + 1
                         continue
@@ -127,11 +125,11 @@ def mutation_calling(args):
                     # SNP
                     else: 
                         if gff_feature:
-                            for g in gff_feature:
-                                # ref_codon, alt_codon, ref_aa, alt_aa = get_codon_aa(ref_seq, alt_seq, i+1) 
-                                outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t{alt_seq[i]}\t{g}\n") 
+                            for k in range(len(gff_feature)):
+                                ref_codon, alt_codon, ref_aa, alt_aa = get_codon_aa(ref_seq, alt_seq, i+1, start[k], end[k]) 
+                                outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t{alt_seq[i]}\t{gff_feature[k]}\t{ref_codon}\t{alt_codon}\t{ref_aa}\t{alt_aa}\n") 
                         else:
-                            outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t{alt_seq[i]}\t""\n") 
+                            outfile.write(f"{record.id}\t{args.region}\t{i+1}\t{ref_seq[i]}\t{alt_seq[i]}\t""\t""\t""\t""\t""\n") 
                 i += 1
     
 
@@ -156,9 +154,9 @@ if __name__ == '__main__':
     main()
 
 # python /home/eleanor124/projects/bjorn_rep/bin/mutation_calling.py \
-#   -a /home/eleanor124/projects/bjorn_rep/output/PB2/alignment.fasta \
-#   --gff /home/eleanor124/projects/bjorn_rep/data/PB2-DMS/PP755596.1.gff \
-#   --region PB2 \
-#   --ref_file /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/ref_all.fasta \
+#   -a /home/eleanor124/projects/bjorn_rep/work/00/9a75dc7214e7f8357b1ec6278a8608/alignment.fasta \
+#   --gff /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
+#   --region Hu1 \
+#   --ref_file /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.fasta \
 #   --ref_id NC_045512.2
 

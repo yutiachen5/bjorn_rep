@@ -8,8 +8,6 @@ process MINIMAP {
 
     script:
     """
-    mkdir -p ${params.outdir}
-
     if [ -f "${params.query_ref_file}" ]; then
         cat ${params.ref_file} ${params.query_ref_file} ${query_seq} > all_seq.fasta
     else
@@ -50,8 +48,6 @@ process GOFASTA_ALIGNMENT {
 
     script:
     """
-    mkdir -p ${params.outdir}
-
     gofasta sam toMultiAlign -s ${alignment_sam} \\
                              -r ${params.ref_file} \\
                              -o alignment.fasta 

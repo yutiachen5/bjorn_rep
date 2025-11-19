@@ -2,15 +2,15 @@
 
 process TRANSLATE_MUTATIONS {    
     input:
-    path alignment_fasta
-    path mutations_tsv
-    path del_helper_tsv
-    val ref_id
-    val query_id
-    val n_ref
+    each query_id
+    tuple path(alignment_fasta), path(mutations_tsv), path(del_helper_tsv)
+    val(ref_id)
+    val(n_ref)
 
     output:
-    path "${query_id}_mutations.tsv", emit: mutations_tsv
+    // path "${query_id}_mutations.tsv", emit: mutations_tsv
+    tuple val(query_id), path("${query_id}_mutations.tsv"), emit: mutations_tsv
+
 
     script:
     """

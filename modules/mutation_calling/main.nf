@@ -8,8 +8,6 @@ process GOFASTA_SAM_VARIANTS {
 
     script:
     """
-    mkdir -p ${params.outdir}
-
     gofasta sam variants -s ${alignment_sam} \\
                          -a ${params.gff_file} \\
                          --append-snps \\

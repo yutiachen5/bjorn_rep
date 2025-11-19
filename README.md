@@ -38,6 +38,7 @@ nextflow run main.nf \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --region NC_045512.2 \
    --outdir $PWD/output/Hu1/mm \
+   --chunk_size 100 \
    -c nf.config
 ```
 

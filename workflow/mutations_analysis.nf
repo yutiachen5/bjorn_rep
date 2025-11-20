@@ -1,6 +1,5 @@
 #!/usr/bin/env nextflow
 
-include { EXTRACT_IDS } from '../modules/extract_data/main.nf'
 include { MINIMAP } from '../modules/alignment/main.nf'
 include { GOFASTA_ALIGNMENT } from '../modules/alignment/main.nf'
 include { GOFASTA_VARIANTS } from '../modules/mutation_calling/main.nf'
@@ -23,45 +22,62 @@ workflow MUTATIONS_ANALYSIS_WORKFLOW {
             .first() // returns the first element in the list, raises error if empty
 
         tmp_ch = combined_fasta_ch.splitFasta(by: params.chunk_size, file: true, elem: 2)
+            .map { f -> tuple(f.baseName, f) }
 
         alignment_sam = MINIMAP(tmp_ch).alignment_sam
-        alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta // the alignment file contains all ref genome
+        alignment_fasta = GOFASTA_ALIGNMENT(alignment_sam).alignment_fasta
         
 
         if (params.gofasta) {
-            GOFASTA_VARIANTS(alignment_fasta, ref_id_ch)
+            GOFASTA_VARIANTS(alignment_fasta.combine(ref_id_ch))
 
             GOFASTA_VARIANTS.out.aa_changes_csv 
                 | GOFASTA_CONVERT
 
-            final_tsv = GOFASTA_CONVERT.out.mutations_tsv.collectFile(
-                storeDir: "${params.outdir}",
-                name: 'mutations.tsv',
-                newLine: false,
-                skip: 1,
-                keepHeader: true,
-            )
+            final_tsv = GOFASTA_CONVERT.out.mutations_tsv
+                .collectFile(
+                    storeDir: "${params.outdir}",
+                    name: 'mutations.tsv',
+                    newLine: false,
+                    skip: 1,
+                    keepHeader: true,
+                )
 
             // collect alignemnt files for sanity check
-            final_alignment = alignment_fasta.collectFile(
-                storeDir: "${params.outdir}",
-                name: 'alignment.fasta',
-                newLine: false,
-                skip: 1*2,
-                keepHeader: true,
-            )
+            final_alignment = alignment_fasta
+                .map{cid, ali -> ali}
+                .collectFile(
+                    storeDir: "${params.outdir}",
+                    name: 'alignment.fasta',
+                    newLine: false,
+                    skip: 1*2,
+                    keepHeader: true,
+                )
         } else {
-            mutation_calling_out = CALL_MUTATION(alignment_fasta, ref_id_ch)
-            mutations_tsv = mutation_calling_out.mutations_tsv
-            del_helper_tsv = mutation_calling_out.del_helper_tsv
+            CALL_MUTATION(alignment_fasta.combine(ref_id_ch))
+            mutations_tsv = CALL_MUTATION.out.mutations_tsv
+            del_helper_tsv = CALL_MUTATION.out.del_helper_tsv
 
-            final_tsv = mutations_tsv.collectFile(
-                storeDir: "${params.outdir}",
-                name: 'mutations.tsv',
-                newLine: false,
-                skip: 1,
-                keepHeader: true
-            )
+            final_tsv = CALL_MUTATION.out.mutations_tsv
+                .map{ cid, mut -> mut}
+                .collectFile(
+                    storeDir: "${params.outdir}",
+                    name: 'mutations.tsv',
+                    newLine: false,
+                    skip: 1,
+                    keepHeader: true
+                )
+
+            // collect helper files for sanity check
+            final_helper_tsv = CALL_MUTATION.out.del_helper_tsv
+                .map{ cid, del -> del}
+                .collectFile(
+                    storeDir: "${params.outdir}",
+                    name: 'del_helper.tsv',
+                    newLine: false,
+                    skip: 1,
+                    keepHeader: true
+                )
 
             if (params.translate_mutations) {
                 query_ids_ch = Channel
@@ -76,35 +92,38 @@ workflow MUTATIONS_ANALYSIS_WORKFLOW {
                 query_ids_ch.toList().then { query_list ->
                     ref_id_ch.toList().then { ref_list ->
                         int n_ref_int = query_list.size() + ref_list.size()   
-
-                        final_alignment = alignment_fasta.collectFile(
-                            storeDir: "${params.outdir}",
-                            name: 'alignment.fasta',
-                            newLine: false,
-                            skip: n_ref_int*2,
-                            keepHeader: true,
-                        )
+                        final_alignment = alignment_fasta
+                            .map{cid, ali -> ali}
+                            .collectFile(
+                                storeDir: "${params.outdir}",
+                                name: 'alignment.fasta',
+                                newLine: false,
+                                skip: n_ref_int*2,
+                                keepHeader: true,
+                            )
                     }
                 }
 
-
-
-
                 trans_input_ch =
                     alignment_fasta
-                        .merge(mutations_tsv)
-                        .merge(del_helper_tsv)
+                        .join(mutations_tsv)
+                        .join(del_helper_tsv)
+                        .map{ cid, ali, mut, del -> tuple(ali, mut, del)}
+
                 TRANSLATE_MUTATIONS(query_ids_ch, trans_input_ch, ref_id_ch, n_ref)
 
-                // TODO: collect tsv files from all chunks by query id
-
-                // final_tsv = TRANSLATE_MUTATIONS.out.mutations_tsv.collectFile(
-                //     storeDir: "${params.outdir}",
-                //     name: 'mutations.tsv',
-                //     newLine: false,
-                //     skip: 1,
-                //     keepHeader: true
-                // )
+                final_tsv_translated = TRANSLATE_MUTATIONS.out.mutations_tsv
+                    .groupTuple()
+                    .flatMap { qid, files ->
+                        files.collect { f -> tuple("${qid}_mutations.tsv", f) }
+                    }
+                    .collectFile(
+                        storeDir: "${params.outdir}",
+                        name: { it[0] },
+                        keepHeader: true,
+                        skip: 1,
+                        newLine: false
+                    )
             }
         }
 

@@ -31,14 +31,14 @@ with manual mutation calling
 ```
 nextflow run main.nf \
    --translate_mutations true \
-   --nsamples 1000 \
+   --nsamples 10 \
    --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
    --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
    --query_ref_file $PWD/data/Hu1-BA/BA.1_and_BA.2.fa \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --region NC_045512.2 \
    --outdir $PWD/output/Hu1/mm \
-   --chunk_size 100 \
+   --chunk_size 2 \
    -c nf.config
 ```
 
@@ -47,12 +47,13 @@ with gofasta mutation calling (no translation) - somthing weird in BA1 is happen
 nextflow run main.nf \
    --gofasta true \
    --translate_mutations false \
-   --nsamples 1000 \
+   --nsamples 10 \
    --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
    --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --region NC_045512.2 \
    --outdir $PWD/output/Hu1/gf_Hu1 \
+   --chunk_size 2 \
    -c nf.config
 ```
 

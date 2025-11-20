@@ -144,11 +144,11 @@ if __name__ == '__main__':
     main()
 
 # python /home/eleanor124/projects/bjorn_rep/bin/translate_mutations.py \
-#   -m /home/eleanor124/projects/bjorn_rep/output/PB2/mm/mutations.tsv \
-#   -a /home/eleanor124/projects/bjorn_rep/output/PB2/mm/alignment.fasta \
-#   --gff /home/eleanor124/projects/bjorn_rep/data/PB2-DMS/PP755596.1.gff \
-#   --bg PP755596.1_cds_XAJ25426.1_1 \
-#   --query CY018884.1_cds_ABM21959.1_1 \
-#   --region PB2 \
-#   -d /home/eleanor124/projects/bjorn_rep/output/PB2/mm/del_helper.tsv \
-#   --n_ref 2
+#   -m /home/eleanor124/projects/bjorn_rep/output/Hu1/mm/mutations.tsv \
+#   -a /home/eleanor124/projects/bjorn_rep/output/Hu1/mm/alignment.fasta \
+#   --gff /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
+#   --bg NC_045512.2 \
+#   --query NC_045512.2_BA.1 \
+#   --region NC_045512.2 \
+#   -d /home/eleanor124/projects/bjorn_rep/output/Hu1/mm/del_helper.tsv \
+#   --n_ref 3

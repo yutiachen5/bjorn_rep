@@ -17,7 +17,7 @@ gofasta sam toMultiAlign \
     -o "alignment.fasta"
 
 gofasta variants --msa "alignment.fasta" \
-                    --reference CY018884.1_cds_ABM21959.1_1 \
+                    --reference NC_045512.2_BA.1 \
                     -a "${GFF}" \
                     --append-snps \
                     -o "aa_changes.csv"

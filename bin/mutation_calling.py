@@ -154,9 +154,9 @@ if __name__ == '__main__':
     main()
 
 # python /home/eleanor124/projects/bjorn_rep/bin/mutation_calling.py \
-#   -a /home/eleanor124/projects/bjorn_rep/work/00/9a75dc7214e7f8357b1ec6278a8608/alignment.fasta \
+#   -a /home/eleanor124/projects/bjorn_rep/testing/5YEQUKFCG/alignment.fasta \
 #   --gff /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
 #   --region Hu1 \
-#   --ref_file /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.fasta \
+#   --ref_file /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2_BA.1.fasta \
 #   --ref_id NC_045512.2
 

@@ -1,10 +1,14 @@
 
 process MINIMAP {
+
+    tag "${chunk_id}"
+
     input:
-    path query_seq
+    tuple val(chunk_id), path(query_seq)
 
     output:
-    path "alignment.sam", emit: alignment_sam
+    tuple val(chunk_id), path("alignment.sam"), emit: alignment_sam
+    // path "alignment.sam", emit: alignment_sam
 
     script:
     """
@@ -20,13 +24,11 @@ process MINIMAP {
              --sam-hit-only \\
              --secondary=no \\
              ${params.ref_file} all_seq.fasta > alignment.sam
-
-    cp -p all_seq.fasta ${params.outdir}/all_seq.fasta
-    cp -p alignment.sam ${params.outdir}/alignment.sam
     """
 }
 
 process MAFFT {
+
     input:
     path query_seq
 
@@ -40,18 +42,20 @@ process MAFFT {
 }
 
 process GOFASTA_ALIGNMENT {
+
+    tag "${chunk_id}"
+
     input:
-    path alignment_sam
+    tuple val(chunk_id), path(alignment_sam)
     
     output:
-    path "alignment.fasta", emit: alignment_fasta
+    tuple val(chunk_id), path("alignment.fasta"), emit: alignment_fasta
 
     script:
     """
     gofasta sam toMultiAlign -s ${alignment_sam} \\
                              -r ${params.ref_file} \\
                              -o alignment.fasta 
-    cp -p alignment.fasta ${params.outdir}/alignment.fasta               
     """
 }
 

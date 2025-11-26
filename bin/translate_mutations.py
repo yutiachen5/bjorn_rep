@@ -3,9 +3,10 @@
 import re
 import argparse
 import pandas as pd
+from Bio.Seq import Seq
 from Bio import SeqIO
 
-def extract_ref_variants(args): 
+def parse_alignment_file(args): 
     records = list(SeqIO.parse(args.a, "fasta"))
 
     seq_len = set([len(record.seq) for record in records])
@@ -13,22 +14,31 @@ def extract_ref_variants(args):
     length = seq_len.pop()
 
     ref_records = records[:args.n_ref] # refs are put at the top of alignment file
-    ref_dic = {record.id: record.seq for record in ref_records if record.id in [args.bg, args.query]}
+    sample_records = records[args.n_ref: ]
 
-    sample_records = records[args.n_ref:]
-    sra = [s.id for s in sample_records]
+    ref_dic = {record.id: record.seq for record in ref_records if record.id in [args.bg, args.query]}
+    sample_dic = {record.id: record.seq for record in sample_records}
 
     references = []
     for i in range(length): 
         if ref_dic[args.bg][i] != ref_dic[args.query][i]:
             references.append({"pos": i+1, "bg.ref":ref_dic[args.bg][i], "q.ref":ref_dic[args.query][i]}) # 1-based index
 
-    return pd.DataFrame(references), ref_dic, sra
+    return pd.DataFrame(references), ref_dic, sample_dic
 
-def get_gff_feature(pos, gff):
+def get_gff_feature(gff, pos):
+    # GFF intervals are 1-based, inclusive
+    # pos is 1-based index
     match = gff[(gff["start"] <= pos) & (pos <= gff["end"])]
 
-    return match["GFF_FEATURE"].tolist() if not match.empty else []
+    if len(match) > 0:
+        gff_feature = match["GFF_FEATURE"].tolist()
+        start = match["start"].tolist()
+        end = match["end"].tolist()
+    else:
+        gff_feature, start, end = [], [], []
+
+    return gff_feature, start, end
 
 def parse_gff(gff_path):
     gff = []
@@ -54,7 +64,7 @@ def extract_del(mutation, helper):
     deletion["start"] = deletion["pos"] + 1
     deletion["end"] = deletion["pos"] + deletion["alt"].apply(lambda x: len(x)-1)
 
-    # region covered by leading or trailing del
+    # region covered by leading or trailing del, start and end are 1-based inclusive
     helper["start"] = helper["pos"] + 1
     helper["end"] = helper["pos"] + helper["alt"].apply(lambda x: len(x)-1)
 
@@ -67,62 +77,103 @@ def match_del(pos, s, deletion):
 
     return True if not match.empty else False
 
+def get_codon_aa(ref_seq, alt_seq, pos, start, end): # pos: 1-based
+    codon_start = (pos-start)//3*3 + start - 1
+    if codon_start + 3 > end:
+        raise Exception ("codon index exceeds the CDS interval")
+
+    ref_codon = ref_seq[codon_start: codon_start + 3]
+    alt_codon = alt_seq[codon_start: codon_start + 3]
+
+    ref_aa = Seq(ref_codon).translate(table=1)
+    try:
+        alt_aa = Seq(alt_codon).translate(table=1)
+    except:
+        alt_aa = ""
+
+    pos_aa = ((pos - start) // 3) + 1
+
+    return ref_codon, alt_codon, ref_aa, alt_aa, pos_aa
+
 def translate_mutations(args):
     mutation = pd.read_csv(args.m, sep="\t", header=0)
     helper = pd.read_csv(args.d, sep="\t", header=0)
     deletion = extract_del(mutation, helper)
 
-    ref_variants, ref_dic, sample_id = extract_ref_variants(args) # ref_variants: {"pos": 2, "Hu1": "A", "BA1": "T"}
+    ref_variants, ref_dic, sample_dic = parse_alignment_file(args) # ref_variants: {"pos": 2, "Hu1": "A", "BA1": "T"}
     gff = parse_gff(args.gff)
-
     bg_seq, q_seq = ref_dic[args.bg], ref_dic[args.query]
-    length = len(bg_seq)
 
     header = ["sra", "region", "pos", "ref", "alt", "GFF_FEATURE", "ref_codon", "alt_codon", "ref_aa", "alt_aa", "pos_aa"]
 
-    # case1: both & old_alt == q.ref, continue
-    # case2: both & old_alt != q.ref, write: ref = q.ref, alt = old_ale
-    # case3: mut on new ref only (old_alt == bg.ref != q.ref), write for all samples: ref = q.ref, alt = bg.ref 
-    # case4: bg.ref == q.ref, write the current mut: ref = old_ref, alt = old_alt
+    # case1: bg.ref == q.ref
+        # case1a: mut_type in (INS, SNP), appended
+        # case1b: mut_type == DEL, update ref seq
+    # case2: bg.ref != q.ref
+        # case2a: bg.ref != alt == q.ref, skip
+        # case2b: bg.ref != alt != q.ref (alt can be del), update ref = q.ref, alt = alt
+        # case2c: bg.ref == alt != q.ref, add ref = q.ref, alt = bg.ref
 
-    with open(args.o, "w") as outfile:
-        outfile.write("\t".join(header) + "\n")
+    pos_diff = ref_variants["pos"].to_list()
 
-        for i in range(length):
-            if (i+1) not in ref_variants["pos"].to_list(): # case 4: bg.ref == q.ref
-                tmp_ins_snp = mutation[(mutation["pos"] == i+1) & (~mutation["alt"].str.startswith("-"))]
-                tmp_ins_snp.to_csv(outfile, sep="\t", header=False, index=False)
+    pos_same = mutation[~mutation["pos"].isin(pos_diff)]
+    # case1a
+    pos_same_ins_snp = pos_same[~pos_same["alt"].str.startswith("-")]
+    # case1b
+    pos_same_del = pos_same[pos_same["alt"].str.startswith("-")].copy().reset_index(drop=True)
+    if not pos_same_del.empty:
+        pos_same_del["alt"] = pos_same_del.apply(
+            lambda row: "-" + ''.join(
+                q_seq[row["pos"]: row["pos"] + len(row["alt"]) - 1]
+            ),
+            axis=1,
+        )
 
-                tmp_del = mutation[(mutation["pos"] == i+1) & (mutation["alt"].str.startswith("-"))]
-                if not tmp_del.empty:
-                    tmp_del = tmp_del.copy()   
-                    tmp_del["alt"] = tmp_del.apply(
-                        lambda row: "-" + q_seq[row["pos"] : row["pos"]+len(row["alt"])-1],
-                        axis=1
-                    )
-                    tmp_del.to_csv(outfile, sep="\t", header=False, index=False)
-            else:
-                gff_feature = get_gff_feature(i+1, gff) 
+    pos_same_mut = pd.concat([pos_same_ins_snp, pos_same_del], axis=0)
 
-                tmp = mutation[mutation["pos"] == i+1]
-                tmp_sample = list(tmp["sra"])
 
-                for s in sample_id:
-                    del_match = match_del(i+1, s, deletion)
-                    if del_match:
-                        continue
-                    if s in tmp_sample: # alt != bg.ref
-                        alt = tmp.loc[tmp["sra"] == s, "alt"].iloc[0]
-                        if alt == q_seq[i]: # case 1: alt != bg.ref & alt == q.ref
-                            continue
-                        else: # case 2: alt != bg.ref & alt != q.ref
-                            for g in gff_feature:
-                                outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], alt, g]) + "\n")
-                    else: # case 3: alt == bg.ref
-                        for g in gff_feature:
-                            outfile.write("\t".join([s, args.region, str(i+1), q_seq[i], bg_seq[i], g]) + "\n")
+    pos_diff_mut = []
 
-            
+    for i in range(len(pos_diff)):
+        pos = pos_diff[i] # 1-based index
+        gff_feature, start, end = get_gff_feature(gff, pos) 
+        tmp = mutation[mutation["pos"] == pos]
+
+        for s in list(sample_dic.keys()):
+            del_match = match_del(pos, s, deletion)
+            if del_match:
+                continue
+            if s in list(tmp["sra"]): # alt != bg.ref
+                alt = tmp.loc[tmp["sra"] == s, "alt"].iloc[0]
+                # case2a
+                if alt == q_seq[pos-1]:
+                    continue
+                # case 2b
+                else: 
+                    if alt.startswith("-"):
+                        pos_diff_mut.append([s, args.region, str(pos), q_seq[pos-1], "-"+q_seq[pos: pos+len(alt)-1], "", "", "", "", "", ""])
+                    else:
+                        for k in range(len(gff_feature)):
+                            ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(q_seq, sample_dic[s], pos, start[k], end[k]) 
+                            if ref_aa == alt_aa: # synonymous mutation
+                                pos_diff_mut.append([s, args.region, str(pos), q_seq[pos-1], alt, "", "", "", "", "", ""])
+                            else:
+                                pos_diff_mut.append([s, args.region, str(pos), q_seq[pos-1], alt, gff_feature[k], ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
+            # case 2c
+            else: 
+                for k in range(len(gff_feature)):                        
+                    ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(q_seq, sample_dic[s], pos, start[k], end[k]) 
+                    if ref_aa == alt_aa: # synonymous mutation
+                        pos_diff_mut.append([s, args.region, str(pos), q_seq[pos-1], bg_seq[pos-1], "", "", "", "", "", ""])
+                    else:
+                        pos_diff_mut.append([s, args.region, str(pos), q_seq[pos-1], bg_seq[pos-1], gff_feature[k], ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
+
+    pos_diff_mut = pd.DataFrame(pos_diff_mut, columns=header)
+
+    pd.concat([pos_same_mut, pos_diff_mut], axis=0) \
+        .sort_values(["sra", "pos"]) \
+        .to_csv(args.o, sep="\t", header=header, index=False)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Extract differences between Hu-1 and other references to infer mutations on other refences.")

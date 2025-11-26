@@ -8,4 +8,6 @@
 *.fasta
 *.sam
 *.fa
+*.tsv
+*.csv
 .nextflow.log*

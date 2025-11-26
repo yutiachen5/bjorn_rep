@@ -2,8 +2,6 @@
 
 process TRANSLATE_MUTATIONS {    
 
-    // tag "${chunk_id}"
-
     input:
     each query_id
     tuple path(alignment_fasta), path(mutations_tsv), path(del_helper_tsv)
@@ -12,7 +10,6 @@ process TRANSLATE_MUTATIONS {
 
     output:
     tuple val(query_id), path("${query_id}_mutations.tsv"), emit: mutations_tsv
-
 
     script:
     """
@@ -26,7 +23,5 @@ process TRANSLATE_MUTATIONS {
         --n_ref ${n_ref} \
         --region ${params.region} \
         -o ${query_id}_mutations.tsv 
-        
-    # cp -p ${query_id}_mutations.tsv ${params.outdir}/${query_id}_mutations.tsv
     """
 }

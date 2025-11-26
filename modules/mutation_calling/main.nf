@@ -11,6 +11,7 @@ process GOFASTA_SAM_VARIANTS {
     gofasta sam variants -s ${alignment_sam} \\
                          -a ${params.gff_file} \\
                          --append-snps \\
+                         --append-codons \\
                          -o aa_changes.csv
 
     # cp -p aa_changes.csv ${params.outdir}/aa_changes.csv

@@ -43,7 +43,7 @@ workflow MUTATIONS_ANALYSIS_WORKFLOW {
                     keepHeader: true,
                 )
 
-            // collect alignemnt files for sanity check
+            // collect alignemnt and aa_changes files for sanity check
             final_alignment = alignment_fasta
                 .map{cid, ali -> ali}
                 .collectFile(
@@ -51,6 +51,15 @@ workflow MUTATIONS_ANALYSIS_WORKFLOW {
                     name: 'alignment.fasta',
                     newLine: false,
                     skip: 1*2,
+                    keepHeader: true,
+                )
+            final_aa_changes = GOFASTA_VARIANTS.out.aa_changes_csv
+                .map{cid, aa_ch -> aa_ch}
+                .collectFile(
+                    storeDir: "${params.outdir}",
+                    name: 'aa_changes.csv',
+                    newLine: false,
+                    skip: 1,
                     keepHeader: true,
                 )
         } else {

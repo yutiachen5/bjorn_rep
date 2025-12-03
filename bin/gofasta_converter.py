@@ -49,7 +49,7 @@ def parse_mutations(df: pl.DataFrame, mutation_col: str, region: str = None, sra
         'nuc_change': r"([A-Z])(\d+)([A-Z])",  # captures ref, pos, alt from nucleotide
         'position_after': r":(\d+):",  # captures position after colon
         'gff_feature': r"aa:([^:]+):",
-        'aa_change': r"aa:[^:]+:([A-Z])(\d+)([A-Z])",  # captures aa ref, pos, alt
+        'aa_change': r"aa:[^:]+:([A-Z*])(\d+)([A-Z*])",  # captures aa ref, pos, alt
         'codon_pair': r"ref:([A-Z]{3})-alt:([A-Z]{3})",  # captures both codons
         'nuc_extract_all': r"nuc:([A-Z]\d+[A-Z])" # Captures individual nucleotide changes
     }

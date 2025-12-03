@@ -6,6 +6,17 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 import pandas as pd
 
+def parse_ref_file(args):
+    ref_records = list(SeqIO.parse(args.ref_file, "fasta"))
+    matched = [rec for rec in ref_records if rec.id == args.ref_id]
+
+    if len(matched) != 1:
+        raise ValueError(f"Reference ID '{args.ref_id}' not found or multiple records found in {args.ref_file}")
+
+    ref_seq = str(matched[0].seq)
+    
+    return ref_seq, len(ref_records)
+
 def parse_gff_file(gff_path):
     gff = []
     with open(gff_path) as gfile:
@@ -19,28 +30,40 @@ def parse_gff_file(gff_path):
             if cols[2] == 'CDS': # cds only
                 start, end = int(cols[3]), int(cols[4])
                 gff_feature = re.search(r"(?<=cds-)[^;\s]+", cols[-1]).group()
-                gff.append({"start": start, "end": end, "GFF_FEATURE": gff_feature})
+                gff.append({"local_start": start, "local_end": end, "GFF_FEATURE": gff_feature})
 
-    return pd.DataFrame(gff)
+    gff_df = pd.DataFrame(gff)
+    gff_df_grouped = (
+        gff_df.groupby("GFF_FEATURE")
+            .agg(global_start=("local_start", "min"),
+                 global_end=("local_end", "max"))
+            .reset_index()
+    )
+
+    gff = gff_df.merge(gff_df_grouped, on="GFF_FEATURE", how="left")
+
+    return gff
 
 def get_gff_feature(gff, pos):
     # GFF intervals are 1-based, inclusive
     # pos is 1-based index
-    match = gff[(gff["start"] <= pos) & (pos <= gff["end"])]
+    match = gff[(gff["local_start"] <= pos) & (pos <= gff["local_end"])]
 
     if len(match) > 0:
         gff_feature = match["GFF_FEATURE"].tolist()
-        start = match["start"].tolist()
-        end = match["end"].tolist()
+        local_start = match["local_start"].tolist()
+        local_end = match["local_end"].tolist()
+        global_start = match["global_start"].tolist()
+        global_end = match["global_end"].tolist()
     else:
-        gff_feature, start, end = [], [], []
+        gff_feature, local_start, local_end, global_start, global_end = [], [], [], [], []
 
-    return gff_feature, start, end
+    return gff_feature, local_start, local_end, global_start, global_end
 
-def get_codon_aa(ref_seq, alt_seq, pos, start, end): 
+def get_codon_aa(ref_seq, alt_seq, pos, local_start, local_end, global_start, global_end): 
     # pos, start, end are all 1-based idx
-    codon_start = (pos-start) // 3 * 3 + start - 1
-    if codon_start + 3 > end:
+    codon_start = (pos - local_start) // 3 * 3 + local_start - 1
+    if codon_start + 2 > local_end:
         raise Exception ("codon index exceeds the CDS interval")
 
     ref_codon = ref_seq[codon_start: codon_start + 3]
@@ -51,21 +74,17 @@ def get_codon_aa(ref_seq, alt_seq, pos, start, end):
         alt_aa = Seq(alt_codon).translate(table=1)
     except:
         alt_aa = ""
+
+    # ignore unknown aa
+    ref_aa = "" if ref_aa == "X" else ref_aa
+    alt_aa = "" if alt_aa == "X" else alt_aa
     
-    pos_aa = ((pos - start) // 3) + 1
+    if global_start != local_start:
+        pos_aa = (pos - local_start) // 3 + 1 + (local_start - global_start) // 3 + 1 
+    else:
+        pos_aa = (pos - local_start) // 3 + 1
 
     return ref_codon, alt_codon, ref_aa, alt_aa, pos_aa
-
-def parse_ref_file(args):
-    ref_records = list(SeqIO.parse(args.ref_file, "fasta"))
-    matched = [rec for rec in ref_records if rec.id == args.ref_id]
-
-    if len(matched) != 1:
-        raise ValueError(f"Reference ID '{args.ref_id}' not found or multiple records found in {args.ref_file}")
-
-    ref_seq = str(matched[0].seq)
-    
-    return ref_seq, len(ref_records)
 
 def mutation_calling(args):
     records = list(SeqIO.parse(args.a, "fasta"))
@@ -88,7 +107,7 @@ def mutation_calling(args):
 
         while i < length:
             if ref_seq[i] != alt_seq[i]:
-                gff_feature, start, end = get_gff_feature(gff, i+1) 
+                gff_feature, local_start, local_end, global_start, global_end = get_gff_feature(gff, i+1) 
 
                 # DEL
                 if alt_seq[i] == "-": 
@@ -125,11 +144,15 @@ def mutation_calling(args):
                 # SNP
                 else: 
                     if gff_feature:
+                        flag = False
                         for k in range(len(gff_feature)):
-                            ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(ref_seq, alt_seq, i+1, start[k], end[k]) 
-                            if ref_aa == alt_aa: # synonymous mutation, only append once
-                                mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", ""])
-                                break
+                            ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(ref_seq, alt_seq, i+1, local_start[k], local_end[k], global_start[k], global_end[k]) 
+                            if ref_aa == alt_aa or ref_aa == "" or alt_aa == "": # synonymous mutation and unknown aa
+                                if flag == False:
+                                    mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", ""])
+                                    flag = True
+                                else:
+                                    continue
                             else:
                                 mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], gff_feature[k], ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
                     else:
@@ -162,9 +185,9 @@ def main():
 if __name__ == '__main__':
     main()
 
-# python /home/eleanor124/projects/bjorn_rep/bin/mutation_calling.py \
-#   -a /home/eleanor124/projects/bjorn_rep/testing/5YEQUKFCG/alignment.fasta \
-#   --gff /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
-#   --region Hu1 \
-#   --ref_file /home/eleanor124/projects/bjorn_rep/data/Hu1-BA/NC_045512.2_BA.1.fasta \
+# python /home/yutianc/bjorn_rep/bin/mutation_calling.py \
+#   -a /home/yutianc/bjorn_rep/output/Hu1/mm/alignment.fasta \
+#   --gff /home/yutianc/bjorn_rep/data/Hu1-BA/NC_045512.2.gff \
+#   --region NC_045512.2 \
+#   --ref_file /home/yutianc/bjorn_rep/data/Hu1-BA/alignment.fasta \
 #   --ref_id NC_045512.2

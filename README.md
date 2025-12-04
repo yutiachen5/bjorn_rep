@@ -31,14 +31,14 @@ with manual mutation calling
 ```
 nextflow run main.nf \
    --translate_mutations true \
-   --nsamples 10 \
+   --nsamples 1000 \
    --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
    --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
    --query_ref_file $PWD/data/Hu1-BA/BA.1_and_BA.2.fa \
    --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
    --region NC_045512.2 \
    --outdir $PWD/output/Hu1/mm \
-   --chunk_size 2 \
+   --chunk_size 20 \
    -c nf.config
 ```
 
@@ -61,6 +61,7 @@ on PB-2 - manual mutation calling:
 ```
 nextflow run main.nf \
    --sampling false \
+   --translate_mutations true \
    --fasta_dir $PWD/data/PB2-DMS/PB2_samples/ \
    --ref_file $PWD/data/PB2-DMS/PP755596.1.fasta \
    --query_ref_file $PWD/data/PB2-DMS/CY018884.1.fasta \
@@ -81,5 +82,6 @@ nextflow run main.nf \
    --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
    --region PB2 \
    --outdir $PWD/output/PB2/gf_PP \
+   --chunk_size 100 \
    -c nf.config
 ```

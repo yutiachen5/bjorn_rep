@@ -2,9 +2,50 @@
 
 import re
 import argparse
+import itertools
+import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
-import pandas as pd
+
+IUPAC = {
+    "R": ["A","G"],
+    "Y": ["C","T"],
+    "S": ["G","C"],
+    "W": ["A","T"],
+    "K": ["G","T"],
+    "M": ["A","C"],
+    "B": ["C","G","T"],
+    "D": ["A","G","T"],
+    "H": ["A","C","T"],
+    "V": ["A","C","G"],
+    "N": ["A","C","G","T"],
+    "-": ["-"],
+}
+
+def expand_base(b):
+    if b in "ACGT":
+        return [b]
+    else:
+        return IUPAC[b]
+    
+def translate(codon):
+    try:
+        return str(Seq("".join(codon)).translate(table=1))
+    except:
+        return "X"
+
+def get_possible_aas(codon):
+    codon = codon.upper()
+    possibilities = itertools.product(
+        expand_base(codon[0]),
+        expand_base(codon[1]),
+        expand_base(codon[2]),
+    )
+    return {translate(p) for p in possibilities}
+
+def consensus_aa(codon):
+    aas = get_possible_aas(codon)
+    return next(iter(aas)) if len(aas) == 1 else "X"
 
 def parse_ref_file(args):
     ref_records = list(SeqIO.parse(args.ref_file, "fasta"))
@@ -66,19 +107,12 @@ def get_codon_aa(ref_seq, alt_seq, pos, local_start, local_end, global_start, gl
     if codon_start + 2 > local_end:
         raise Exception ("codon index exceeds the CDS interval")
 
-    ref_codon = ref_seq[codon_start: codon_start + 3]
-    alt_codon = alt_seq[codon_start: codon_start + 3]
+    ref_codon = ref_seq[codon_start: codon_start + 3].upper()
+    alt_codon = alt_seq[codon_start: codon_start + 3].upper()
 
-    ref_aa = Seq(ref_codon).translate(table=1)
-    try:
-        alt_aa = Seq(alt_codon).translate(table=1)
-    except:
-        alt_aa = ""
+    ref_aa = consensus_aa(ref_codon)
+    alt_aa = consensus_aa(alt_codon)
 
-    # ignore unknown aa
-    ref_aa = "" if ref_aa == "X" else ref_aa
-    alt_aa = "" if alt_aa == "X" else alt_aa
-    
     if global_start != local_start:
         pos_aa = (pos - local_start) // 3 + 1 + (local_start - global_start) // 3 + 1 
     else:
@@ -147,7 +181,7 @@ def mutation_calling(args):
                         flag = False
                         for k in range(len(gff_feature)):
                             ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(ref_seq, alt_seq, i+1, local_start[k], local_end[k], global_start[k], global_end[k]) 
-                            if ref_aa == alt_aa or ref_aa == "" or alt_aa == "": # synonymous mutation and unknown aa
+                            if ref_aa == alt_aa: # synonymous mutation and unknown aa
                                 if flag == False:
                                     mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", ""])
                                     flag = True

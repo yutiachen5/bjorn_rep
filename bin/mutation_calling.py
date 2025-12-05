@@ -3,6 +3,7 @@
 import re
 import argparse
 import itertools
+import numpy as np
 import pandas as pd
 from Bio import SeqIO
 from Bio.Seq import Seq
@@ -155,7 +156,7 @@ def mutation_calling(args):
                         i = j + 1
                         continue
                     
-                    mut.append([record.id, args.region, i, ref_seq[i-1], "-"+deleted, "", "", "", "", "", ""])
+                    mut.append([record.id, args.region, i, ref_seq[i-1], "-"+deleted, "", "", "", "", "", np.nan])
                     i = j + 1
                     continue
 
@@ -171,7 +172,7 @@ def mutation_calling(args):
                     #     i = j + 1
                     #     continue
 
-                    mut.append([record.id, args.region, i, ref_seq[i-1], "+"+inserted, "", "", "", "", "", ""])
+                    mut.append([record.id, args.region, i, ref_seq[i-1], "+"+inserted, "", "", "", "", "", np.nan])
                     i = j + 1
                     continue
 
@@ -183,20 +184,38 @@ def mutation_calling(args):
                             ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(ref_seq, alt_seq, i+1, local_start[k], local_end[k], global_start[k], global_end[k]) 
                             if ref_aa == alt_aa: # synonymous mutation and unknown aa
                                 if flag == False:
-                                    mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", ""])
+                                    mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
                                     flag = True
                                 else:
                                     continue
                             else:
                                 mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], gff_feature[k], ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
                     else:
-                        mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", ""])
+                        mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
             i += 1
 
-    helper = pd.DataFrame(helper, columns=helper_header)       
+    helper = pd.DataFrame(helper, columns=helper_header) 
+    helper = helper.astype({
+        "sra": "string",
+        "pos": "Int64",
+        "alt": "string",
+    })      
     helper.to_csv("del_helper.tsv", sep="\t", index=False, header=helper_header)
 
     mut = pd.DataFrame(mut, columns=header)
+    mut = mut.astype({
+        "sra": "string",
+        "region": "string",
+        "pos": "Int64",
+        "ref": "string",
+        "alt": "string",
+        "GFF_FEATURE": "string",
+        "ref_codon": "string",
+        "alt_codon": "string",
+        "ref_aa": "string",
+        "alt_aa": "string",
+        "pos_aa": "Int64",
+    })
     mut.to_csv(args.o, sep="\t", index=False, header=header)
 
 

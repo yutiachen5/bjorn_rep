@@ -68,6 +68,7 @@ nextflow run main.nf \
    --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
    --region PB2 \
    --outdir $PWD/output/PB2/mm \
+   --chunk_size 100 \
    -c nf.config
 ```
 

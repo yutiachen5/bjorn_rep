@@ -3,9 +3,6 @@ FROM golang:1.23-alpine AS builder
 
 RUN apk add --no-cache git
 
-# set working dir
-# WORKDIR /src
-
 # install gofasta
 RUN git clone https://github.com/virus-evolution/gofasta.git && \
     cd gofasta && \
@@ -52,10 +49,14 @@ ENV PATH=/opt/conda/envs/bjorn/bin:$PATH
 SHELL ["conda", "run", "-n", "env", "/bin/bash", "-c"]
 
 CMD ["nextflow", "run", "main.nf", \
-    "--ref_file", "/workspace/data/NC_045512.2.fasta", \
-    "--fasta_dir", "/workspace/data/consensus_sequences", \
-    "--gff_file", "/workspace/data/NC_045512.2.gff", \
-    "--query", "/workspace/data/BA.1_and_BA.2.fa", \
+    "--translate_mutations", "true", \
+    "--nsamples", "1000", \
+    "--fasta_dir", "/workspace/data/sc2/consensus_sequences", \
+    "--ref_file", "/workspace/data/sc2/NC_045512.2.fasta", \
+    "--query_ref_file", "/workspace/data/sc2/BA.1_and_BA.2.fa", \
+    "--gff_file", "/workspace/data/sc2/NC_045512.2.gff", \
     "--region", "NC_045512.2", \
+    "--outdir", "/workspace/output/Hu1/mm", \
+    "--chunk_size", "20", \
     "-c", "nf.config"]
 

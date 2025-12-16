@@ -1,9 +1,9 @@
-// randomly sample 100 samples from the consensus genome or get all fasta files under the input dir
-
 process SAMPLING {
+    label "process_low"
 
     output:
-    path "combined.fasta", emit: combined_fasta
+    path("combined.fasta"), emit: combined_fasta
+    path("versions.yml"), emit: versions
 
     script:
     """
@@ -15,10 +15,23 @@ process SAMPLING {
                 -o fasta_files.txt
 
     xargs cat < fasta_files.txt > combined.fasta
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version | sed 's/Python //g')
+    END_VERSIONS
+    """
+
+    stub:
+    """
+    echo ">stub_sequence" > combined.fasta
+    echo "ACGTACGTACGTACGT" >> combined.fasta
+    touch versions.yml
     """
 }
 
 process GET_ALL_FASTA {
+    label "process_low"
 
     output:
     path "combined.fasta", emit: combined_fasta
@@ -30,5 +43,11 @@ process GET_ALL_FASTA {
     find ${params.fasta_dir} -type f \\( -name "*.fasta" -o -name "*.fa" \\) -exec realpath {} \\; > fasta_files.txt
 
     xargs cat < fasta_files.txt > combined.fasta
+    """
+
+    stub:
+    """
+    echo ">stub_sequence" > combined.fasta
+    echo "ACGTACGTACGTACGT" >> combined.fasta
     """
 }

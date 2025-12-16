@@ -1,6 +1,7 @@
 #!/usr/bin/env nextflow
 
-process TRANSLATE_MUTATIONS {    
+process TRANSLATE_MUTATIONS { 
+    label "process_high"
 
     input:
     each query_id
@@ -10,6 +11,7 @@ process TRANSLATE_MUTATIONS {
 
     output:
     tuple val(query_id), path("${query_id}_mutations.tsv"), emit: mutations_tsv
+    path("versions.yml"), emit: versions
 
     script:
     """
@@ -23,5 +25,16 @@ process TRANSLATE_MUTATIONS {
         --n_ref ${n_ref} \
         --region ${params.region} \
         -o ${query_id}_mutations.tsv 
+    
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        python: \$(python --version | sed 's/Python //g')
+    END_VERSIONS
+    """
+
+    stub:
+    """
+    touch ${query_id}_mutations.tsv
+    touch versions.yml
     """
 }

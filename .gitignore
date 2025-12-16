@@ -1,8 +1,10 @@
 /work
 /.nextflow
-/data
+/data/sc2/consensus_sequences
+/data/pb2/PB2_samples
 /output
 /testing
+/tmp_scripts
 /mutations
 *.txt
 *.log

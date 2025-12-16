@@ -1,23 +1,16 @@
-replication of bjorn pipeline: https://github.com/andersen-lab/bjorn-general/tree/master
+# Bjorn
 
-current workflow:
+This pipeline is the rebuild and improved version of bjorn pipeline: https://github.com/andersen-lab/bjorn-general/tree/master. The Bjorn-general pipeline is a Nextflow pipeline designed for analysis of H5N1 influenza sequence data, integrating deep mutational scanning (DMS), and obtaining mutations at both a host and population level.
 
-1. extract data from consensus sequence (HCoV-19: https://github.com/andersen-lab/HCoV-19-Genomics)
+## Key Features
 
-2. alignment using minimap2
-   - reference:NC_045512.2
-    - Hu-1
-    - Ba-1
+*   **Variant Calling:** Identifies sequence variants relative to a reference genome and translates mutations to other reference geomes in DMS.
 
-3. mutation calling 
-   - gofasta sam variants
-   - manual calling
+## Data Setup
 
-4. Translate mutations from current reference genome to other reference genomes
-   - [BA.1 mutations](output/NC_045512.2_BA.1_mutations.tsv)
-   - [BA.2 mutations](output/NC_045512.2_BA.2_mutations.tsv)
-   - Limitations:
-     - only works when len(bg.seq) == len(q.seq)
+*   **Reference Genome:** A default `reference.fasta` file is included under [SC2_Reference](data/sc2)
+*   **Sequence Data:** The pipeline was only tested on all San Diego samples from [andersen-lab/avian-influenza](https://github.com/andersen-lab/HCoV-19-Genomics).
+
 
 
 current cmd to run with docker:
@@ -26,61 +19,62 @@ docker build -t bjorn .
 docker run bjorn
 ```
 
+current cmd to run in terminal:
 
-with manual mutation calling
+manual mutation calling
 ```
 nextflow run main.nf \
    --translate_mutations true \
    --nsamples 1000 \
-   --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
-   --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
-   --query_ref_file $PWD/data/Hu1-BA/BA.1_and_BA.2.fa \
-   --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
+   --fasta_dir $PWD/data/sc2/consensus_sequences \
+   --ref_file $PWD/data/sc2/NC_045512.2.fasta \
+   --query_ref_file $PWD/data/sc2/BA.1_and_BA.2.fa \
+   --gff_file $PWD/data/sc2/NC_045512.2.gff \
    --region NC_045512.2 \
    --outdir $PWD/output/Hu1/mm \
    --chunk_size 20 \
    -c nf.config
 ```
 
-with gofasta mutation calling (no translation) - somthing weird in BA1 is happening
+gofasta mutation calling (no translation) 
 ```
 nextflow run main.nf \
    --gofasta true \
    --translate_mutations false \
    --nsamples 10 \
-   --fasta_dir $PWD/data/Hu1-BA/consensus_sequences \
-   --ref_file $PWD/data/Hu1-BA/NC_045512.2.fasta \
-   --gff_file $PWD/data/Hu1-BA/NC_045512.2.gff \
+   --fasta_dir $PWD/data/sc2/consensus_sequences \
+   --ref_file $PWD/data/sc2/NC_045512.2.fasta \
+   --gff_file $PWD/data/sc2/NC_045512.2.gff \
    --region NC_045512.2 \
    --outdir $PWD/output/Hu1/gf_Hu1 \
    --chunk_size 2 \
    -c nf.config
 ```
 
-on PB-2 - manual mutation calling:
+PB-2 - manual mutation calling:
 ```
 nextflow run main.nf \
    --sampling false \
    --translate_mutations true \
-   --fasta_dir $PWD/data/PB2-DMS/PB2_samples/ \
-   --ref_file $PWD/data/PB2-DMS/PP755596.1.fasta \
-   --query_ref_file $PWD/data/PB2-DMS/CY018884.1.fasta \
-   --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
+   --fasta_dir $PWD/data/pb2/PB2_samples/ \
+   --ref_file $PWD/data/pb2/PP755596.1.fasta \
+   --query_ref_file $PWD/data/pb2/CY018884.1.fasta \
+   --gff_file $PWD/data/pb2/PP755596.1.gff \
    --region PB2 \
    --outdir $PWD/output/PB2/mm \
    --chunk_size 100 \
    -c nf.config
 ```
 
-on PB-2 - gofasta variants:
+PB-2 - gofasta variants:
 ```
 nextflow run main.nf \
    --gofasta true \
    --translate_mutations false \
    --sampling false \
-   --fasta_dir $PWD/data/PB2-DMS/PB2_samples/ \
-   --ref_file $PWD/data/PB2-DMS/PP755596.1.fasta \
-   --gff_file $PWD/data/PB2-DMS/PP755596.1.gff \
+   --fasta_dir $PWD/data/pb2/PB2_samples/ \
+   --ref_file $PWD/data/pb2/PP755596.1.fasta \
+   --gff_file $PWD/data/pb2/PP755596.1.gff \
    --region PB2 \
    --outdir $PWD/output/PB2/gf_PP \
    --chunk_size 100 \

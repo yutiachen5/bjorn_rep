@@ -1,6 +1,6 @@
 # Bjorn
 
-This pipeline is the rebuild and improved version of bjorn pipeline: https://github.com/andersen-lab/bjorn-general/tree/master. The Bjorn-general pipeline is a Nextflow pipeline designed for analysis of H5N1 influenza sequence data, integrating deep mutational scanning (DMS), and obtaining mutations at both a host and population level.
+This pipeline is the rebuilt of [Bjorn-general](https://github.com/andersen-lab/bjorn-general.git). The Bjorn-general pipeline is a Nextflow pipeline designed for analysis of H5N1 influenza sequence data, integrating deep mutational scanning (DMS), and obtaining mutations at both a host and population level.
 
 ## Key Features
 

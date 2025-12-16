@@ -8,9 +8,7 @@
 /mutations
 *.txt
 *.log
-*.fasta
 *.sam
-*.fa
 *.tsv
-*.csv
 .nextflow.log*
+/nextflow

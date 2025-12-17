@@ -41,13 +41,13 @@ gofasta mutation calling (no translation)
 nextflow run main.nf \
    --gofasta true \
    --translate_mutations false \
-   --nsamples 10 \
+   --nsamples 1000 \
    --fasta_dir $PWD/data/sc2/consensus_sequences \
    --ref_file $PWD/data/sc2/NC_045512.2.fasta \
    --gff_file $PWD/data/sc2/NC_045512.2.gff \
    --region NC_045512.2 \
    --outdir $PWD/output/Hu1/gf_Hu1 \
-   --chunk_size 2 \
+   --chunk_size 20 \
    -c nf.config
 ```
 

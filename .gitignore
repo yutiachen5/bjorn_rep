@@ -10,5 +10,6 @@
 *.log
 *.sam
 *.tsv
+*.sh
 .nextflow.log*
 /nextflow

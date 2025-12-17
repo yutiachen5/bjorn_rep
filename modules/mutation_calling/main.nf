@@ -34,6 +34,7 @@ process GOFASTA_VARIANTS {
                      --reference ${ref_id} \\
                      -a ${params.gff_file} \\
                      --append-snps \\
+                     --append-codons \\
                      -o aa_changes.csv
 
     cat <<-END_VERSIONS > versions.yml
@@ -74,7 +75,7 @@ process GOFASTA_CONVERT {
     END_VERSIONS
     """
 
-    stub
+    stub:
     """
     touch mutations.tsv
     touch versions.yml

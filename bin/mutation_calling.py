@@ -182,7 +182,11 @@ def mutation_calling(args):
                         flag = False
                         for k in range(len(gff_feature)):
                             ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(ref_seq, alt_seq, i+1, local_start[k], local_end[k], global_start[k], global_end[k]) 
-                            if ref_aa == alt_aa: # synonymous mutation and unknown aa
+                            # if ref_codon contains N or gap, skip 
+                            if "N" in ref_codon.upper() or "-" in ref_codon.upper():
+                                continue
+                            # synonymous mutation and unknown aa
+                            if ref_aa == alt_aa: 
                                 if flag == False:
                                     mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
                                     flag = True

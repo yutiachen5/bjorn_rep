@@ -59,8 +59,8 @@ def parse_alignment_file(args):
     ref_records = records[:args.n_ref] # refs are put at the top of alignment file
     sample_records = records[args.n_ref: ]
 
-    ref_dic = {record.id: str(record.seq) for record in ref_records if record.id in [args.bg, args.query]}
-    sample_dic = {record.id: str(record.seq) for record in sample_records}
+    ref_dic = {record.id: str(record.seq).upper() for record in ref_records if record.id in [args.bg, args.query]}
+    sample_dic = {record.id: str(record.seq).upper() for record in sample_records}
 
     references = []
     for i in range(length): 
@@ -265,6 +265,9 @@ def translate_mutations(args):
                             flag = False
                             for k in range(len(gff_feature)):
                                 ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(q_seq, sample_dic[s], pos, local_start[k], local_end[k], global_start[k], global_end[k]) 
+                                # if ref_codon contains N or gap, skip 
+                                if "N" in ref_codon.upper() or "-" in ref_codon.upper():
+                                    continue
                                 # synonymous mutation or unkown aa
                                 if ref_aa == alt_aa: 
                                     if flag == False:
@@ -282,6 +285,9 @@ def translate_mutations(args):
                     flag = False
                     for k in range(len(gff_feature)):                        
                         ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(q_seq, sample_dic[s], pos, local_start[k], local_end[k], global_start[k], global_end[k]) 
+                        # if ref_codon contains N or gap, skip 
+                        if "N" in ref_codon.upper() or "-" in ref_codon.upper():
+                            continue
                         # synonymous mutation or unkown aa
                         if ref_aa == alt_aa: 
                             if flag == False:

@@ -31,7 +31,7 @@ nextflow run main.nf \
    --query_ref_file $PWD/data/sc2/BA.1_and_BA.2.fa \
    --gff_file $PWD/data/sc2/NC_045512.2.gff \
    --region NC_045512.2 \
-   --outdir $PWD/output/Hu1/mm \
+   --outdir $PWD/output/SC2/mm \
    --chunk_size 20 \
    -c nf.config
 ```
@@ -46,7 +46,7 @@ nextflow run main.nf \
    --ref_file $PWD/data/sc2/NC_045512.2.fasta \
    --gff_file $PWD/data/sc2/NC_045512.2.gff \
    --region NC_045512.2 \
-   --outdir $PWD/output/Hu1/gf_Hu1 \
+   --outdir $PWD/output/SC2/gf_Hu1 \
    --chunk_size 20 \
    -c nf.config
 ```
@@ -79,4 +79,30 @@ nextflow run main.nf \
    --outdir $PWD/output/PB2/gf_PP \
    --chunk_size 100 \
    -c nf.config
+```
+
+Docker:
+```
+docker run -it -v "$PWD":/workspace -w /workspace bjorn \
+   conda run -n bjorn nextflow run main.nf \
+   --profile docker \
+   --translate_mutations true \
+   --sampling false \
+   --fasta_dir /workspace/data/sc2/consensus_sequences \
+   --ref_file /workspace/data/sc2/NC_045512.2.fasta \
+   --query_ref_file /workspace/data/sc2/escape_all.fa \
+   --gff_file /workspace/data/sc2/NC_045512.2.gff \
+   --region NC_045512.2 \
+   --outdir /workspace/mutations/SC2/escape_all/ \
+   --chunk_size 20 \
+   -c nf.config
+```
+
+```
+docker run --rm -it \
+  -v "$PWD":/workspace -w /workspace \
+  -e NXF_ANSI_LOG=true \
+  -e TERM=xterm-256color \
+  bjorn \
+  bash -lc 'conda run -n bjorn nextflow run main.nf -profile docker --translate_mutations true --sampling false --fasta_dir /workspace/data/sc2/consensus_sequences --ref_file /workspace/data/sc2/NC_045512.2.fasta --query_ref_file /workspace/data/sc2/escape_all.fa --gff_file /workspace/data/sc2/NC_045512.2.gff --region NC_045512.2 --outdir /workspace/mutations/SC2/escape_all/ --chunk_size 20 -c nf.config'
 ```

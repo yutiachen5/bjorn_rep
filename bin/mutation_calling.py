@@ -36,7 +36,6 @@ def translate(codon):
         return "X"
 
 def get_possible_aas(codon):
-    codon = codon.upper()
     possibilities = itertools.product(
         expand_base(codon[0]),
         expand_base(codon[1]),
@@ -48,6 +47,20 @@ def consensus_aa(codon):
     aas = get_possible_aas(codon)
     return next(iter(aas)) if len(aas) == 1 else "X"
 
+def extract_sid(ref_id, sra):
+    # SC2
+    if re.search(r"NC_045512\.2", ref_id, flags=re.IGNORECASE) is not None:
+        if len(sra.split("/")) == 4:
+            sid = sra.split("/")[2]
+        elif sra.startswith("Consensus_"):
+            sid = sra.split("_")[1]
+        else:
+            sid = sra
+    # H5N1
+    else:
+        sid = sra.split("_")[1] # TODO: handle other viruses 
+    return sid
+
 def parse_ref_file(args):
     ref_records = list(SeqIO.parse(args.ref_file, "fasta"))
     matched = [rec for rec in ref_records if rec.id == args.ref_id]
@@ -55,7 +68,7 @@ def parse_ref_file(args):
     if len(matched) != 1:
         raise ValueError(f"Reference ID '{args.ref_id}' not found or multiple records found in {args.ref_file}")
 
-    ref_seq = str(matched[0].seq)
+    ref_seq = str(matched[0].seq).upper()
     
     return ref_seq, len(ref_records)
 
@@ -108,8 +121,8 @@ def get_codon_aa(ref_seq, alt_seq, pos, local_start, local_end, global_start, gl
     if codon_start + 2 > local_end:
         raise Exception ("codon index exceeds the CDS interval")
 
-    ref_codon = ref_seq[codon_start: codon_start + 3].upper()
-    alt_codon = alt_seq[codon_start: codon_start + 3].upper()
+    ref_codon = ref_seq[codon_start: codon_start + 3]
+    alt_codon = alt_seq[codon_start: codon_start + 3]
 
     ref_aa = consensus_aa(ref_codon)
     alt_aa = consensus_aa(alt_codon)
@@ -139,6 +152,7 @@ def mutation_calling(args):
     for record in records[n_ref: ]: # refs are put at the top of this file
         i = 0
         alt_seq = str(record.seq).upper()
+        sid = extract_sid(args.ref_id, record.id)
 
         while i < length:
             if ref_seq[i] != alt_seq[i]:
@@ -152,11 +166,11 @@ def mutation_calling(args):
                     deleted = ref_seq[i:j+1]
 
                     if i == 0 or j == length - 1: # leading or trailing del
-                        helper.append([record.id, i, "-"+deleted])
+                        helper.append([sid, i, "-"+deleted])
                         i = j + 1
                         continue
                     
-                    mut.append([record.id, args.region, i, ref_seq[i-1], "-"+deleted, "", "", "", "", "", np.nan])
+                    mut.append([sid, args.region, i, ref_seq[i-1], "-"+deleted, "", "", "", "", "", np.nan])
                     i = j + 1
                     continue
 
@@ -171,8 +185,7 @@ def mutation_calling(args):
                     # if i == 0 or j == length - 1:
                     #     i = j + 1
                     #     continue
-
-                    mut.append([record.id, args.region, i, ref_seq[i-1], "+"+inserted, "", "", "", "", "", np.nan])
+                    mut.append([sid, args.region, i, ref_seq[i-1], "+"+inserted, "", "", "", "", "", np.nan])
                     i = j + 1
                     continue
 
@@ -183,19 +196,19 @@ def mutation_calling(args):
                         for k in range(len(gff_feature)):
                             ref_codon, alt_codon, ref_aa, alt_aa, pos_aa = get_codon_aa(ref_seq, alt_seq, i+1, local_start[k], local_end[k], global_start[k], global_end[k]) 
                             # if ref_codon contains N or gap, skip 
-                            if "N" in ref_codon.upper() or "-" in ref_codon.upper():
+                            if "N" in ref_codon or "-" in ref_codon:
                                 continue
                             # synonymous mutation and unknown aa
                             if ref_aa == alt_aa: 
                                 if flag == False:
-                                    mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
+                                    mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
                                     flag = True
                                 else:
                                     continue
                             else:
-                                mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], gff_feature[k], ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
+                                mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], gff_feature[k]+'_'+args.region, ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
                     else:
-                        mut.append([record.id, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
+                        mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
             i += 1
 
     helper = pd.DataFrame(helper, columns=helper_header) 
@@ -236,7 +249,6 @@ def main():
     args = parser.parse_args()
 
     mutation_calling(args)
-    
 
     
 if __name__ == '__main__':

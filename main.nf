@@ -48,8 +48,6 @@ if (params.help) {
 }
 
 workflow {
-    log.info "Start consensus genome alignment.."
-
     validateParameters()
 
     mutation_ch = EXTRACT_MUTATIONS().mutations_tsv

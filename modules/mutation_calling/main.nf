@@ -82,7 +82,7 @@ process GOFASTA_CONVERT {
     """
 }
 
-// manual mutation calling, include missing values 
+// manual mutation calling, include missing values  and X as invalid aa
 process CALL_MUTATION {
     tag "${chunk_id}"
     label 'process_high'
@@ -91,7 +91,7 @@ process CALL_MUTATION {
     tuple val(chunk_id), path(alignment_fasta), val(ref_id)
     
     output:
-    tuple val(chunk_id), path("mutations.tsv"), emit: mutations_tsv
+    tuple val(chunk_id), path("${ref_id}_mutations.tsv"), emit: mutations_tsv
     tuple val(chunk_id), path("del_helper.tsv"), emit: del_helper_tsv
     path("versions.yml"), emit: versions
 
@@ -104,7 +104,7 @@ process CALL_MUTATION {
                         --region ${params.region} \\
                         --ref_file ref_all.fasta \\
                         --ref_id ${ref_id} \\
-                        -o mutations.tsv
+                        -o ${ref_id}_mutations.tsv 
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -114,8 +114,32 @@ process CALL_MUTATION {
 
     stub:
     """
-    touch mutations.tsv
+    touch ${ref_id}_mutations.tsv
     touch del_helper.tsv
     touch versions.yml
+    """
+}
+
+// stack mutation files
+process CONCAT_MUTATIONS {
+    label "process_low"
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true
+
+    input:
+    path mut_files, stageAs: 'in_*'
+
+    output:
+    path 'mutations.tsv'
+
+    script:
+    """
+    set -euo pipefail
+    shopt -s nullglob
+
+    files=(in_*)
+    head -n 1 "\${files[0]}" > mutations.tsv
+    for f in "\${files[@]}"; do
+      tail -n +2 "\$f" >> mutations.tsv
+    done
     """
 }

@@ -1,16 +1,17 @@
 #!/usr/bin/env nextflow
 
 process TRANSLATE_MUTATIONS { 
+    tag "${chunk_id}"
     label "process_high"
 
     input:
     each query_id
-    tuple path(alignment_fasta), path(mutations_tsv), path(del_helper_tsv)
+    tuple val(chunk_id), path(alignment_fasta), path(mutations_tsv), path(del_helper_tsv)
     val(ref_id)
     val(n_ref)
 
     output:
-    tuple val(query_id), path("${query_id}_mutations.tsv"), emit: mutations_tsv
+    tuple val(chunk_id), val(query_id), path("${query_id}_mutations.tsv"), emit: mutations_tsv
     path("versions.yml"), emit: versions
 
     script:
@@ -23,7 +24,7 @@ process TRANSLATE_MUTATIONS {
         --query ${query_id} \
         --bg ${ref_id} \
         --n_ref ${n_ref} \
-        --region ${params.region} \
+        --region ${query_id} \
         -o ${query_id}_mutations.tsv 
     
     cat <<-END_VERSIONS > versions.yml

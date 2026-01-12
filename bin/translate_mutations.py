@@ -206,41 +206,52 @@ def translate_mutations(args):
     ].copy().reset_index(drop=True)
 
     pos_same_snp_rows = []
+    seen =set()
     for _, row in pos_same_snp_raw.iterrows():
         pos = int(row["pos"]) # 1-based genomic position
         sid = row["sra"]
         alt = row["alt"]
         ref_nt = row["ref"]
         region = args.region
+        gff_feature_bg = row["GFF_FEATURE"]
 
-        gff_feature, local_start, local_end, global_start, global_end = get_gff_feature(gff, pos)
+        if pd.isna(gff_feature_bg) or gff_feature_bg == "": 
+            out = (sid, region, pos, ref_nt, alt, "",  "", "",  "",  "", None)
+            if out not in seen:
+                pos_same_snp_rows.append([sid, region, pos, ref_nt, alt, "",  "", "",  "",  "", None])
+                seen.add(out)
+            continue 
+        else: 
+            # recompute since ref_codon and ref_aa can be different
+            gff_feature_q, local_start, local_end, global_start, global_end = get_gff_feature(gff, pos) 
 
-        if not gff_feature:
-            pos_same_snp_rows.append([sid, region, pos, ref_nt, alt, "",  "", "",  "",  "", np.nan])
-            continue
+            for k in range(len(gff_feature_q)):
+                # 0-based codon start in genome coordinates
+                codon_start = (pos - local_start[k]) // 3 * 3 + local_start[k] - 1
+                if codon_start + 2 > local_end[k]:
+                    raise Exception("codon index exceeds the CDS interval")
 
-        # recompute since codon can be different
-        for k in range(len(gff_feature)):
-            # 0-based codon start in genome coordinates
-            codon_start = (pos - local_start[k]) // 3 * 3 + local_start[k] - 1
-            if codon_start + 2 > local_end[k]:
-                raise Exception("codon index exceeds the CDS interval")
+                ref_codon = q_seq[codon_start: codon_start + 3]
+                alt_codon = sample_dic[sid][codon_start: codon_start + 3]
 
-            ref_codon = q_seq[codon_start: codon_start + 3]
-            alt_codon = sample_dic[sid][codon_start: codon_start + 3]
+                ref_aa = consensus_aa(ref_codon)
+                alt_aa = consensus_aa(alt_codon)
 
-            ref_aa = consensus_aa(ref_codon)
-            alt_aa = consensus_aa(alt_codon)
+                if global_start[k] == local_start[k]:
+                    pos_aa = (pos - local_start[k]) // 3 + 1
+                else:
+                    pos_aa = (pos - local_start[k]) // 3 + 1 + (local_start[k] - global_start[k]) // 3 + 1
 
-            if global_start[k] == local_start[k]:
-                pos_aa = (pos - local_start[k]) // 3 + 1
-            else:
-                pos_aa = (pos - local_start[k]) // 3 + 1 + (local_start[k] - global_start[k]) // 3 + 1
-
-            if ref_aa == alt_aa:
-                pos_same_snp_rows.append([sid, region, pos, ref_nt, alt, "", "", "", "", "", np.nan])
-            else:
-                pos_same_snp_rows.append([sid, region, pos, ref_nt, alt, gff_feature[k]+"_"+region, ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
+                if ref_aa == alt_aa:
+                    out = (sid, region, pos, ref_nt, alt, "", "", "", "", "", None)
+                    if out not in seen:
+                        pos_same_snp_rows.append([sid, region, pos, ref_nt, alt, "", "", "", "", "", None])
+                        seen.add(out)
+                else:
+                    out = (sid, region, pos, ref_nt, alt, gff_feature_q[k]+"_"+region, ref_codon, alt_codon, ref_aa, alt_aa, pos_aa)
+                    if out not in seen:
+                        pos_same_snp_rows.append([sid, region, pos, ref_nt, alt, gff_feature_q[k]+"_"+region, ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
+                        seen.add(out)
 
     pos_same_snp = pd.DataFrame(pos_same_snp_rows, columns=header)
 
@@ -274,7 +285,7 @@ def translate_mutations(args):
                 # case 2b
                 else: 
                     if alt.startswith("-"):
-                        pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], "-"+q_seq[pos: pos+len(alt)-1], "", "", "", "", "", np.nan])
+                        pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], "-"+q_seq[pos: pos+len(alt)-1], "", "", "", "", "", None])
                     else:
                         if gff_feature:
                             flag = False
@@ -286,14 +297,14 @@ def translate_mutations(args):
                                 # synonymous mutation or unkown aa
                                 if ref_aa == alt_aa: 
                                     if flag == False:
-                                        pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], alt, "", "", "", "", "", np.nan])
+                                        pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], alt, "", "", "", "", "", None])
                                         flag = True
                                     else:
                                         continue
                                 else:
                                     pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], alt, gff_feature[k]+"_"+args.region, ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
                         else:
-                            pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], alt, "", "", "", "", "", np.nan])
+                            pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], alt, "", "", "", "", "", None])
             # case 2c
             else: 
                 if gff_feature:
@@ -306,14 +317,14 @@ def translate_mutations(args):
                         # synonymous mutation or unkown aa
                         if ref_aa == alt_aa: 
                             if flag == False:
-                                pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], bg_seq[pos-1], "", "", "", "", "", np.nan])
+                                pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], bg_seq[pos-1], "", "", "", "", "", None])
                                 flag = True
                             else:
                                 continue
                         else:
                             pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], bg_seq[pos-1], gff_feature[k]+"_"+args.region, ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
                 else:
-                    pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], bg_seq[pos-1], "", "", "", "", "", np.nan])
+                    pos_diff_mut.append([sid, args.region, pos, q_seq[pos-1], bg_seq[pos-1], "", "", "", "", "", None])
 
     pos_diff_mut = pd.DataFrame(pos_diff_mut, columns=header)
 

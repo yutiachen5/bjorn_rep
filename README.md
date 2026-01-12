@@ -28,10 +28,10 @@ nextflow run main.nf \
    --nsamples 1000 \
    --fasta_dir $PWD/data/sc2/consensus_sequences \
    --ref_file $PWD/data/sc2/NC_045512.2.fasta \
-   --query_ref_file $PWD/data/sc2/BA.1_and_BA.2.fa \
+   --query_ref_file $PWD/data/sc2/escape_all.fa \
    --gff_file $PWD/data/sc2/NC_045512.2.gff \
    --region NC_045512.2 \
-   --outdir $PWD/output/SC2/mm \
+   --outdir $PWD/output/SC2/escape_all \
    --chunk_size 20 \
    -c nf.config
 ```

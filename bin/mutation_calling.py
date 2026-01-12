@@ -170,7 +170,7 @@ def mutation_calling(args):
                         i = j + 1
                         continue
                     
-                    mut.append([sid, args.region, i, ref_seq[i-1], "-"+deleted, "", "", "", "", "", np.nan])
+                    mut.append([sid, args.region, i, ref_seq[i-1], "-"+deleted, "", "", "", "", "", None])
                     i = j + 1
                     continue
 
@@ -185,7 +185,7 @@ def mutation_calling(args):
                     # if i == 0 or j == length - 1:
                     #     i = j + 1
                     #     continue
-                    mut.append([sid, args.region, i, ref_seq[i-1], "+"+inserted, "", "", "", "", "", np.nan])
+                    mut.append([sid, args.region, i, ref_seq[i-1], "+"+inserted, "", "", "", "", "", None])
                     i = j + 1
                     continue
 
@@ -201,14 +201,14 @@ def mutation_calling(args):
                             # synonymous mutation and unknown aa
                             if ref_aa == alt_aa: 
                                 if flag == False:
-                                    mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
+                                    mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", None])
                                     flag = True
                                 else:
                                     continue
                             else:
                                 mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], gff_feature[k]+'_'+args.region, ref_codon, alt_codon, ref_aa, alt_aa, pos_aa])
                     else:
-                        mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", np.nan])
+                        mut.append([sid, args.region, i+1, ref_seq[i], alt_seq[i], "", "", "", "", "", None])
             i += 1
 
     helper = pd.DataFrame(helper, columns=helper_header) 

@@ -82,21 +82,6 @@ nextflow run main.nf \
 ```
 
 Docker:
-```
-docker run -it -v "$PWD":/workspace -w /workspace bjorn \
-   conda run -n bjorn nextflow run main.nf \
-   --profile docker \
-   --translate_mutations true \
-   --sampling false \
-   --fasta_dir /workspace/data/sc2/consensus_sequences \
-   --ref_file /workspace/data/sc2/NC_045512.2.fasta \
-   --query_ref_file /workspace/data/sc2/escape_all.fa \
-   --gff_file /workspace/data/sc2/NC_045512.2.gff \
-   --region NC_045512.2 \
-   --outdir /workspace/mutations/SC2/escape_all/ \
-   --chunk_size 20 \
-   -c nf.config
-```
 
 ```
 docker run --rm -it \
